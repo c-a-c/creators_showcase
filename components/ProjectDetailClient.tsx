@@ -4,6 +4,7 @@ import { useParams } from 'next/navigation'; // URLパラメータを取得す�
 import { Project } from "@/types";
 import Link from "next/link";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from 'remark-gfm';
 
 // このコンポーネントは全プロジェクトデータをpropsとして受け取ります
 export default function ProjectDetailClient({ allProjects }: { allProjects: Project[] }) {
@@ -38,24 +39,29 @@ export default function ProjectDetailClient({ allProjects }: { allProjects: Proj
       </div>
 
       <article className="prose dark:prose-invert max-w-none mb-8">
-        <ReactMarkdown>{project.description}</ReactMarkdown>
+        <ReactMarkdown remarkPlugins={[remarkGfm]}>{project.description}</ReactMarkdown>
       </article>
 
       {project.youtubeId ? (
-        <div className="aspect-w-16 aspect-h-9 mb-8">
-          <iframe
-            src={`https://www.youtube.com/embed/${project.youtubeId}`}
-            title="YouTube video player"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-            className="w-full h-full border-0 rounded-lg shadow-lg"
-          ></iframe>
+        <div className="max-w-4xl mx-auto"> 
+          <div className="relative h-0 pb-[56.25%] rounded-lg shadow-lg overflow-hidden">
+            <iframe
+              src={`https://www.youtube.com/embed/${project.youtubeId}`}
+              title="YouTube video player"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              className="absolute top-0 left-0 w-full h-full border-0"
+            ></iframe>
+          </div>
         </div>
       ) : (
         <div className="text-center py-8 bg-gray-100 dark:bg-gray-800 rounded-lg mb-8">
           <p>動画はありません</p>
         </div>
       )}
+
+      <br />
+      <br />
 
       <div className="mb-8 p-4 border rounded-lg bg-gray-50 dark:bg-gray-800 dark:border-gray-700">
         <h3 className="text-lg font-semibold mb-2">使用技術</h3>
@@ -65,7 +71,7 @@ export default function ProjectDetailClient({ allProjects }: { allProjects: Proj
           ))}
         </div>
       </div>
-      
+
       {(project.websiteUrl || project.githubUrl) && (
         <div className="mb-8 p-4 border rounded-lg bg-gray-50 dark:bg-gray-800 dark:border-gray-700">
           <h3 className="text-lg font-semibold mb-2">関連リンク</h3>
