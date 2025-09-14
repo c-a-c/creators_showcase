@@ -1,0 +1,24 @@
+[
+  {
+    "id": "project-1",
+    "title": "革新的TODOアプリ",
+    "author": "開発 太郎",
+    "team": "チームA",
+    "technologies": ["Next.js", "TypeScript", "Vercel"],
+    "description": "## 概要\n\n これは **革新的なTODOアプリ** です。\n\n- AIによるタスク自動提案機能\n- ポモドーロタイマー連携\n\n### こだわりのポイント\nUI/UXに徹底的にこだわりました。",
+    "youtubeId": "dQw4w9WgXcQ",
+    "websiteUrl": "https://example.com",
+    "githubUrl": "https://github.com/example/repo"
+  },
+  {
+    "id": "project-2",
+    "title": "ミュージックプレイヤー",
+    "author": "設計 花子",
+    "team": "チームB",
+    "technologies": ["React", "Firebase"],
+    "description": "シンプルなミュージックプレイヤーです。\nドラッグ＆ドロップでプレイリストを編集できます。",
+    "youtubeId": null,
+    "websiteUrl": null,
+    "githubUrl": "https://github.com/example/repo2"
+  }
+]
