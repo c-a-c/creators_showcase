@@ -14,4 +14,5 @@ export interface Project {
   youtubeId: string | null;
   websiteUrl: string | null;
   githubUrl: string | null;
+  pdfPath: string | null;
 }

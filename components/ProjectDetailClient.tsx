@@ -38,10 +38,6 @@ export default function ProjectDetailClient({ allProjects }: { allProjects: Proj
         <p><strong>チーム:</strong> {project.team}</p>
       </div>
 
-      <article className="prose dark:prose-invert max-w-none mb-8">
-        <ReactMarkdown remarkPlugins={[remarkGfm]}>{project.description}</ReactMarkdown>
-      </article>
-
       {project.youtubeId ? (
         <div className="max-w-4xl mx-auto"> 
           <div className="relative h-0 pb-[56.25%] rounded-lg shadow-lg overflow-hidden">
@@ -63,6 +59,10 @@ export default function ProjectDetailClient({ allProjects }: { allProjects: Proj
       <br />
       <br />
 
+      <article className="prose dark:prose-invert max-w-none mb-8">
+        <ReactMarkdown remarkPlugins={[remarkGfm]}>{project.description}</ReactMarkdown>
+      </article>
+
       <div className="mb-8 p-4 border rounded-lg bg-gray-50 dark:bg-gray-800 dark:border-gray-700">
         <h3 className="text-lg font-semibold mb-2">使用技術</h3>
         <div className="flex flex-wrap gap-2">
@@ -72,12 +72,22 @@ export default function ProjectDetailClient({ allProjects }: { allProjects: Proj
         </div>
       </div>
 
-      {(project.websiteUrl || project.githubUrl) && (
+      {(project.websiteUrl || project.githubUrl || project.pdfPath) && ( // pdfPathも条件に追加
         <div className="mb-8 p-4 border rounded-lg bg-gray-50 dark:bg-gray-800 dark:border-gray-700">
           <h3 className="text-lg font-semibold mb-2">関連リンク</h3>
           <div className="space-y-1">
             {project.websiteUrl && <a href={project.websiteUrl} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline block">作品サイト</a>}
             {project.githubUrl && <a href={project.githubUrl} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline block">GitHubリポジトリ</a>}
+            {project.pdfPath && (
+              <a 
+                href={`/${project.pdfPath}`} 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="text-blue-500 hover:underline block"
+              >
+                資料PDFを見る
+              </a>
+            )}
           </div>
         </div>
       )}
