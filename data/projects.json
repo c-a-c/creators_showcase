@@ -1,24 +1,82 @@
 [
   {
     "id": "project-1",
-    "title": "革新的TODOアプリ",
-    "author": "開発 太郎",
-    "team": "チームA",
-    "technologies": ["Next.js", "TypeScript", "Vercel"],
-    "description": "## 概要\n\n これは **革新的なTODOアプリ** です。\n\n- AIによるタスク自動提案機能\n- ポモドーロタイマー連携\n\n### こだわりのポイント\nUI/UXに徹底的にこだわりました。",
-    "youtubeId": "dQw4w9WgXcQ",
+    "title": "Let's 産卵",
+    "author": "",
+    "team": "",
+    "technologies": [
+      "C#",
+      "Unity"
+    ],
+    "description": "## 頑張った点\n 3Dゲーム制作に初挑戦。\nCinemeshineやDollyCameraなどのカメラ制御。\nSplineを利用したオブジェクトの移動。\n三人称視点での移動を実装。\nUIのボタンやInputSystemなどのイベント駆動の理解に努め、実装した。\n\n ## 工夫した点\n\n 川を泳いでいる感じにしたかったので、川に触れている時のみ逆方向に力がかかるようにした。また、川の流れに乗っているときは、プレイヤーが操作していなくても少しずつ流されるようにした。\n\n ## 苦労した点\n Unity初心者であり、3Dゲーム制作も初めての挑戦だったため、作りが粗かったり、コードに未熟な点も多いかと思います。\n\n今後もゲーム開発を続け、より良いものを作れるよう努力していきたいので、ぜひ率直で厳しめのご意見をいただけると嬉しいです。\n\n",
+    "youtubeId": "WZsKvTRMKk8",
     "websiteUrl": "https://example.com",
-    "githubUrl": "https://github.com/example/repo"
+    "githubUrl": "https://github.com/example/repo",
+    "pdfPath": null
   },
   {
     "id": "project-2",
-    "title": "ミュージックプレイヤー",
-    "author": "設計 花子",
-    "team": "チームB",
-    "technologies": ["React", "Firebase"],
-    "description": "シンプルなミュージックプレイヤーです。\nドラッグ＆ドロップでプレイリストを編集できます。",
-    "youtubeId": null,
+    "title": "四季折々！？ 季語の細道",
+    "author": "",
+    "team": "",
+    "technologies": [
+      "Scratch"
+    ],
+    "description": "## プログラムの利用方法\nリンクにアクセスし、緑の旗をクリックまたはタップしてスタート。\nその後は画面をタップまたはクリックで遊べます。\n拡大表示ができます。\nPC、タブレット、スマホ（横向きで拡大表示推奨）対応。\n\nブラウザはChromeとMicrosoft Edge推奨、Safari対応（文字の位置等表示が異なる可能性あり）。\n\n[別途資料](/2025/siki/siki1.pdf)\n\n ## ゲーム説明\n旧暦の季節を基準とし、現代で使われる季節を表す語200語からランダムに出題されます。\n何の季節の季語か分かるか！？\n現代語だから簡単かもね？\nでも「旧暦」だから意外と間違えるんですよネー。\n5回間違えたら終了なので気をつけまショー。\n\n※明らかに季語じゃない語もありますが、それは「季節を表す語」を集めているからです。\n※製作者で俳句に詳しい人はいません。あしからず。",
+    "youtubeId": "d9jw-9Lg6DY",
+    "websiteUrl": "https://scratch.mit.edu/projects/1174810803/",
+    "githubUrl": "",
+    "pdfPath": "2025/siki/siki1.pdf"
+  },
+  {
+    "id": "project-3",
+    "title": "SHIKI",
+    "author": "",
+    "team": "",
+    "technologies": [
+      "html",
+      "css",
+      "javascript"
+    ],
+    "description": "# 利用方法\n\n## インストール\n1. Chromeベースのブラウザを用意します\n2. 「拡張機能を管理する」を押して管理画面に移ってください\n3. 「開発者モード」をONにします\n4. 「パッケージ化されていない拡張機能を読み込む」からSHIKIフォルダを選択します\n\nP.S. 補足動画を入れました。\n\n以下の動画を参考にインストールしてみてください\n\n[インストール方法](/2025/siki/explain.mp4)\n\n[設定画面を開く方法](/2025/siki/explain2.mp4)\n\n## 注意点\n1. 拡張機能をインストールする前に開いていたタブは、更新しないと拡張機能が働きません。これはChromeの仕様なのでご了承ください。\n2. Javascriptを有効にする必要があります。\n\n## 使い方\n入力欄(textarea, タイプ属性が未指定のinput, タイプ属性がtextのinput)で文字を削除するとパーティクルが現れます。\n\nSHIKIのパーティクルの大きさや重力、数などのパーティクルのカスタマイズや、特定のサイトでは実行しないフィルター機能は設定から変更できます。設定変更は、SHIKIのアイコンをクリックすると現れる設定用のポップアップから好きな値を入力でき、入力するとその値が自動で反映されます。\n\n## 頑張った点・工夫した点\n\n## キャレットの絶対座標の取得\nキャレットの絶対座標は通常メゾットにはなく、何文字目にキャレットがいるかしかわかりません。そこで以下の方法で絶対座標を求めました。\n1. 文字が消された要素と同じスタイルのダミー要素を作成\n2. ダミー要素の文字を、元要素のキャレットより前の文字にする。\n3. ダミー要素の文字の最後にspan要素を挿入する。\n4. span要素の絶対座標がキャレットの絶対座標になる\n\n## パーティクルのカスタマイズ\nユーザーをより楽しませたり、自分好みにするためにパーティクルをカスタマイズできるようにしました。また誰でもカスタマイズしやすいように、重力は基準を1にしたり、描画時間をmsから秒に変更しました。\n\n",
+    "youtubeId": "eb7uKEEnhuE",
     "websiteUrl": null,
-    "githubUrl": "https://github.com/example/repo2"
+    "githubUrl": "https://github.com/example/repo2",
+    "pdfPath": null
+  },
+  {
+    "id": "project-4",
+    "title": "seamail",
+    "author": "",
+    "team": "",
+    "technologies": [
+      "ruby",
+      "ruby on rails"
+    ],
+    "description": "## 頑張った点\n初めてwebアプリケーションに挑戦したことです。\n私は今までネイティブアプリケーションやunityを使用したゲーム制作しか行ってきませんでした。\nしかし、友人がwebアプリケーションの制作を初めてさまざまなものを作っていることを知り、\n私も体験したいと思ったことで初めてwebアプリケーションの作成をruby on railsを使用して挑戦してみました。\n\nフレームワークの仕様や、そもそもwebに対してもhtmlとcssを30分触った程度しか経験がなかったため想定外のことや、web特有のエラーの内容を読み解いたりと初めて故の苦労をしました。\nしかし、この経験を通してrubyの言語仕様やrailsの使い方などを浅く、広く学ぶことができました。特にgmailとの連携にはapiを通してリソースを取得するための過程はとても楽しかったです。\n加えて、今後簡易的なwebページを作る際にも役立つと感じたこともモチベーションにつながりました。\n\n頑張った点としてこのような初めての技術領域に挑戦することと、それに順応するために苦労したことです。\n次回は思い切ってhtml,css,javascript,phpで書いてみようと思います。\n\n## 工夫した点\n1. クロスサイトスクリプティング(XSS)攻撃に対する対策をサニタイズによって実施している。\n2. モジュール化と役割分担の徹底(RailsのDRY原則の適用)\n    2-1. メール本文のデコードやパートの検索といった複雑なデータ処理ロジックは、HomeControllerからHomeHelperに分けています。\n    2-2. homecontrollerに記載したbefore_actionを使用して各アクションで繰り返される認証情報の確認ロジックをbefore_action :check_session_infoとして共通化し、privateメソッドとして隠蔽しています。",
+    "youtubeId": "DgqEYlWvW5I",
+    "websiteUrl": null,
+    "githubUrl": "https://github.com/TSUJI-Shogo/gmail-on-rails",
+    "pdfPath": null
+  },
+  {
+    "id": "project-5",
+    "title": "seasonal-colors-main",
+    "author": "",
+    "team": "",
+    "technologies": [
+      "@opennextjs/cloudflare",
+      "TypeScript",
+      "Next.js 15 App Router",
+      "Tailwind CSS",
+      "seedrandom",
+      "eslint",
+      "wrangler"
+    ],
+    "description": "# SeasonalColors\n\n## 各種リンク\n### ソースコード\n\nhttps://github.com/nenrinyear/seasonal-colors\n\n### デモ\nhttps://color.nenrin.me/\n\n## 使用言語\n- Node.js\n\n## 利用ライブラリ等\n- `@opennextjs/cloudflare`\n- `TypeScript`\n- `Next.js 15 App Router`\n- `Tailwind CSS`\n- `seedrandom`\n- `eslint`\n- `wrangler`\n\n## 動作概要\n![image](https://github.com/user-attachments/assets/0477be25-b88e-4bdf-89fd-5086fc3d76f1)\nhttps://color.nenrin.me/ にアクセスした様子\n\n![image](https://github.com/user-attachments/assets/98653053-a272-4f97-8d98-0a00a4fa05d2)\n翌日にアクセスした様子(WorkersKV, seedramdom,を利用し乱数を永続化)\n\n## 頑張った点\n- 色の生成手段について自ら考案、またアルゴリズムの方針を検討\n  - 四季に応じた配色\n  - 1年を通じて滑らかに変化していく\n  - ランダムに値が振れるため毎日見ていても飽きない\n- Cloudflareの製品群(Workers, WorkersKV)を活用し、無料・軽量なホスティングを実現\n\n## 利用方法\n### 1. Webサイトにアクセス\nhttps://color.nenrin.me/ にアクセス\n\n## 2. セルフホストする\n\nお好みのパッケージマネージャーで、package.jsonに記載の`build`スクリプトを実行する",
+    "youtubeId": "Q_aIe86rM8s",
+    "websiteUrl": "https://color.nenrin.me/",
+    "githubUrl": "https://github.com/nenrinyear/seasonal-colors",
+    "pdfPath": null
   }
 ]
