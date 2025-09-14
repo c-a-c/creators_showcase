@@ -1,0 +1,36 @@
+name: Deploy Pages
+
+on:
+  push:
+    branches:
+      - main  # メインブランチにプッシュされたときに実行
+  workflow_dispatch:  # 手動でワークフローを実行可能にする
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Pages
+        id: pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: 'pages'  # このフォルダ内のコンテンツをすべてアップロード
+
+  deploy:
+    name: Deploy
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
