@@ -56,7 +56,7 @@
     "description": "## 頑張った点\n初めてwebアプリケーションに挑戦したことです。\n私は今までネイティブアプリケーションやunityを使用したゲーム制作しか行ってきませんでした。\nしかし、友人がwebアプリケーションの制作を初めてさまざまなものを作っていることを知り、\n私も体験したいと思ったことで初めてwebアプリケーションの作成をruby on railsを使用して挑戦してみました。\n\nフレームワークの仕様や、そもそもwebに対してもhtmlとcssを30分触った程度しか経験がなかったため想定外のことや、web特有のエラーの内容を読み解いたりと初めて故の苦労をしました。\nしかし、この経験を通してrubyの言語仕様やrailsの使い方などを浅く、広く学ぶことができました。特にgmailとの連携にはapiを通してリソースを取得するための過程はとても楽しかったです。\n加えて、今後簡易的なwebページを作る際にも役立つと感じたこともモチベーションにつながりました。\n\n頑張った点としてこのような初めての技術領域に挑戦することと、それに順応するために苦労したことです。\n次回は思い切ってhtml,css,javascript,phpで書いてみようと思います。\n\n## 工夫した点\n1. クロスサイトスクリプティング(XSS)攻撃に対する対策をサニタイズによって実施している。\n2. モジュール化と役割分担の徹底(RailsのDRY原則の適用)\n    2-1. メール本文のデコードやパートの検索といった複雑なデータ処理ロジックは、HomeControllerからHomeHelperに分けています。\n    2-2. homecontrollerに記載したbefore_actionを使用して各アクションで繰り返される認証情報の確認ロジックをbefore_action :check_session_infoとして共通化し、privateメソッドとして隠蔽しています。",
     "youtubeId": "DgqEYlWvW5I",
     "websiteUrl": null,
-    "githubUrl": "https://github.com/TSUJI-Shogo/gmail-on-rails2",
+    "githubUrl": "https://github.com/TSUJI-Shogo/gmail-on-rails",
     "pdfPath": null
   },
   {
