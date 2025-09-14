@@ -169,7 +169,8 @@ Pushをきっかけに自動でビルドとデプロイが実行され、数分�
 │   └── ThemeSwitcher.tsx    # テーマ切替ボタン
 │
 ├── /lib/
-│   └── data.ts            # データ読み込み関数
+│   └── /data/ 
+│       └── data.ts            # データ読み込み関数
 │
 ├── /public/
 │   └── /thumbnails/       # ここにサムネイル画像 (id.pngなど) を置く
@@ -178,7 +179,7 @@ Pushをきっかけに自動でビルドとデプロイが実行され、数分�
 │   ├── config.json
 │   └── projects.json
 │
-└── @types/index.ts         # データ型の定義
+└── types/index.ts         # データ型の定義
 ```
 
 ### デプロイ
