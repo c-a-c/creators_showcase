@@ -3,27 +3,36 @@
 このリポジトリは、「プログラミングコンテスト作品展示サイト」のソースコード管理用です。
 サイトのコンテンツ更新を行う**運営者の方**と、システムの改修を行う**開発者の方**へ向けた情報を記載しています。
 
-##  TOC (Table of Contents)
+## TOC (Table of Contents)
 - [プログラミングコンテスト作品展示サイト Readme](#プログラミングコンテスト作品展示サイト-readme)
   - [TOC (Table of Contents)](#toc-table-of-contents)
   - [1. サイト運営者様向けガイド](#1-サイト運営者様向けガイド)
-    - [A. 作品を追加・編集する方法 (`projects.json`)](#a-作品を追加編集する方法-projectsjson)
-    - [B. サムネイル画像を追加する方法](#b-サムネイル画像を追加する方法)
-    - [C. サイト全体の設定を変更する方法 (`config.json`)](#c-サイト全体の設定を変更する方法-configjson)
-    - [D. 変更をサイトに反映させるには](#d-変更をサイトに反映させるには)
+    - [A. コンテンツ更新の基本フロー](#a-コンテンツ更新の基本フロー)
+    - [B. 作品を追加・編集する方法 (`projects.json`)](#b-作品を追加編集する方法-projectsjson)
+    - [C. サムネイル画像を追加する方法](#c-サムネイル画像を追加する方法)
+      - [**方法2：説明文の中に自由にリンクを埋め込む**](#方法2説明文の中に自由にリンクを埋め込む)
+    - [E. サイト全体の設定を変更する方法 (`config.json`)](#e-サイト全体の設定を変更する方法-configjson)
   - [2. 開発者向けガイド](#2-開発者向けガイド)
     - [技術スタック](#技術スタック)
     - [セットアップとローカル開発](#セットアップとローカル開発)
     - [ディレクトリ構成](#ディレクトリ構成)
+    - [アーキテクチャ概要](#アーキテクチャ概要)
     - [デプロイ](#デプロイ)
 
 ---
 
 ## 1. サイト運営者様向けガイド
 
-このサイトは、いくつかのテキストファイル（JSONファイル）を編集するだけで、表示される作品や情報を簡単に追加・更新できるように作られています。
+このサイトは、いくつかのテキストファイル（JSONファイル）を編集し、ファイルを所定の場所に配置するだけで、表示される作品や情報を簡単に追加・更新できるように作られています。
 
-### A. 作品を追加・編集する方法 (`projects.json`)
+### A. コンテンツ更新の基本フロー
+
+1.  **JSONファイルを編集する**: 作品情報 (`projects.json`) やサイト設定 (`config.json`) をテキストエディタで編集します。
+2.  **ファイルを追加する**: 必要に応じて、サムネイル画像やPDF資料を `/public` フォルダ内の指定の場所に配置します。
+3.  **変更をGitHubにPushする**: 編集したファイルや追加したファイルをGitHubにPush（プッシュ）します。
+4.  **自動でサイトが更新される**: Pushをきっかけに自動でデプロイが実行され、数分後に公開されているWebサイトが更新されます。
+
+### B. 作品を追加・編集する方法 (`projects.json`)
 
 すべての作品情報は、`/data/projects.json` というファイルで管理しています。
 このファイルを編集することで、作品の追加、修正、削除が可能です。
@@ -44,21 +53,18 @@
     "author": "作者名",
     "team": "チーム名",
     "technologies": ["Next.js", "TypeScript"],
-    "description": "## 概要\nここに作品の説明を書きます。**Markdown記法**が使えます。\n\n- 特徴1\n- 特徴2",
+    "description": "## 概要\nここに作品の説明を書きます。**Markdown記法**が使えます。",
     "youtubeId": "dQw4w9WgXcQ",
     "websiteUrl": "https://example.com",
-    "githubUrl": "https://github.com/example/repo"
+    "githubUrl": "https://github.com/example/repo",
+    "pdfPath": "contest2025/spec-a.pdf"
   },
   {
     "id": "project-2",
     "title": "作品Bのタイトル",
-    "author": "作者名B",
-    "team": "チーム名B",
-    "technologies": ["React"],
-    "description": "動画がない作品の例です。",
+    // ...
     "youtubeId": null,
-    "websiteUrl": null,
-    "githubUrl": null
+    "pdfPath": null
   }
 ]
 ```
@@ -70,15 +76,14 @@
 | `id` | 作品の固有ID | **必須** | **他の作品と絶対に重複しない**英数字とハイフン `-` で設定してください。サムネイル画像ファイル名と連動します。 |
 | `title` | 作品名 | **必須** | |
 | `author` | 作者名 | **必須** | |
-| `team` | チーム名 | **必須** | |
-| `technologies` | 使用技術 | **必須** | `["技術A", "技術B"]` のように、`[]`の中にカンマ区切りで記述します。 |
-| `description` | 作品説明文 | **必須** | Markdown記法が使えます。見出しは`##`、太字は`**太字**`、リストは `-` など。改行は `\n` を入力します。 |
-| `youtubeId` | YouTube動画ID | 任意 | YouTube動画のURL `https://www.youtube.com/watch?v=dQw4w9WgXcQ` の `v=` の後の文字列です。動画がない場合は `null` としてください。 |
+| `team` | チーム名 | **必須** | `["技術A", "技術B"]` のように、`[]`の中にカンマ区切りで記述します。 |
+| `description` | 作品説明文 | **必須** | GitHub Flavored Markdown (GFM) 記法が使えます（見出し、太字、リスト、テーブル、打消し線など）。改行は `\n` を入力します。 |
+| `youtubeId` | YouTube動画ID | 任意 | 動画のURL `https://www.youtube.com/watch?v=dQw4w9WgXcQ` の `v=` の後の11文字の文字列です。動画がない場合は `null` としてください。 |
 | `websiteUrl` | 作品サイトURL | 任意 | リンクがない場合は `null` としてください。 |
 | `githubUrl` | GitHubリポジトリURL | 任意 | リンクがない場合は `null` としてください。 |
+| `pdfPath` | 資料PDFへのパス | 任意 | `/public`からの相対パス。例: `"contest2025/spec.pdf"`。PDFがない場合は`null`。 |
 
-
-### B. サムネイル画像を追加する方法
+### C. サムネイル画像を追加する方法
 
 作品一覧ページに表示するサムネイルは、以下のルールで自動的に表示されます。
 
@@ -89,36 +94,66 @@ YouTube動画がない作品のサムネイルは、手動でフォルダにア�
 
 **アップロード場所:**
 ```
-/public/thumbnails/
-```
+/public/thumbnails/```
 
 **ファイル名のルール:**
 ファイル名は、対応する作品の `id` と同じにする必要があります。
--   作品IDが `"project-2"` なら、ファイル名は `project-2.png` や `project-2.jpg` としてください。
+-   作品IDが `"project-2"` なら、ファイル名は `project-2.png` や `project-2.jpg` としてください。（`.png`, `.jpg`, `.jpeg`, `.webp`に対応）
 -   対応する画像がない場合、黒い画像が表示されます。
 
+### D. PDF資料を追加する方法（2つの方法）
 
-### C. サイト全体の設定を変更する方法 (`config.json`)
+作品にPDFの資料（企画書、仕様書など）を紐付けることができます。運用しやすい方を選択してください。
 
-トップページに表示されるコンテスト名や、投票フォームのリンク先は `/data/config.json` ファイルで管理します。
+#### **方法1：「関連リンク」に専用のボタンとして表示する**
+作品詳細ページの下部にある「関連リンク」セクションに、「資料PDFを見る」というリンクを自動で追加する方法です。
 
-**ファイル場所:**
+**1. PDFファイルを配置する**
+`/public`フォルダの中に、コンテスト用のフォルダを作成します（例: `/public/contest2025/`）。そのフォルダの中に、各作品のPDFファイルを配置してください。
 ```
-/data/config.json
+/public/
+└── /contest2025/
+    ├── spec-a.pdf
+    └── spec-b.pdf
 ```
 
-```json:data/config.json
+**2. JSONファイルにパスを記述する**
+`/data/projects.json` を開き、該当する作品に `pdfPath` を追加し、`/public` からのパスを記述します。
+```json
 {
-  "contestName": "プログラミングコンテスト 2025",
-  "eventDate": "2025年10月26日",
-  "description": "年に一度のプログラミングコンテストの作品展示サイトです。素晴らしい作品の数々をご覧ください。",
+  "id": "project-1",
+  // ...
+  "pdfPath": "contest2025/spec-a.pdf"
 }
 ```
 
-### D. 変更をサイトに反映させるには
+#### **方法2：説明文の中に自由にリンクを埋め込む**
+作品の `description` の中に、Markdownのリンク形式で直接PDFへのリンクを記述する方法です。
 
-上記 A, B, C の変更を行った後、**変更内容をGitHubにPush（プッシュ）するだけ**です。
-Pushをきっかけに自動でビルドとデプロイが実行され、数分後に公開されているWebサイトが更新されます。
+**1. PDFファイルを配置する**
+方法1と同様に、`/public` フォルダ内にPDFファイルを配置します。
+
+**2. 説明文の中にリンクを記述する**
+`/data/projects.json` の `description` を編集します。
+```json
+"description": "作品の説明文です。\n\n詳しい仕様は [こちらのPDF](/contest2025/spec-a.pdf) をご覧ください。"
+```
+-   `[ ]` の中に表示したいテキスト、`( )` の中に `/` から始まるPDFファイルへのパスを記述します。
+-   `/public/` の部分は含めずに記述してください。
+
+### E. サイト全体の設定を変更する方法 (`config.json`)
+
+トップページに表示されるコンテスト名や説明文は `/data/config.json` ファイルで管理します。この説明文もMarkdown記法に対応しています。
+
+**ファイル場所:**
+```
+/data/config.json``````json:data/config.json
+{
+  "contestName": "プログラミングコンテスト 2025",
+  "eventDate": "2025年10月26日",
+  "description": "## 開催概要\n年に一度の**プログラミングコンテスト**の作品展示サイトです。\n素晴らしい作品の数々をご覧ください。"
+}
+```
 
 ---
 
@@ -127,63 +162,47 @@ Pushをきっかけに自動でビルドとデプロイが実行され、数分�
 ### 技術スタック
 - **Framework**: Next.js 14 (App Router)
 - **Language**: TypeScript
-- **Styling**: Tailwind CSS
-- **Markdown Rendering**: `react-markdown`
+- **Styling**: Tailwind CSS (+ Typography, Aspect-Ratio plugins)
+- **Markdown Rendering**: `react-markdown` + `remark-gfm`
 - **Theme Switching**: `next-themes`
 - **Deployment**: Vercel
 
 ### セットアップとローカル開発
 
-1.  **リポジトリのクローン**
-    ```bash
-    git clone https://github.com/[your-username]/[repository-name].git
-    cd [repository-name]
-    ```
-
-2.  **依存関係のインストール**
-    ```bash
-    npm install
-    ```
-
-3.  **開発サーバーの起動**
-    ```bash
-    npm run dev
-    ```
-    ブラウザで `http://localhost:3000` を開いてください。
+1.  **リポジトリのクローン**: `git clone ...`
+2.  **依存関係のインストール**: `npm install`
+3.  **開発サーバーの起動**: `npm run dev`
 
 ### ディレクトリ構成
-
 ```
 .
-├── /app/
-│   ├── /projects/
-│   │   ├── /[id]/page.tsx   # 作品詳細ページ
-│   │   └── page.tsx         # 作品一覧ページ
-│   ├── layout.tsx         # 全体のレイアウト・テーマ設定
-│   ├── globals.css        # グローバルCSS（Tailwind CSS設定）
-│   └── page.tsx           # トップページ
-│
-├── /components/
-│   ├── Footer.tsx         # フッター
-│   ├── Header.tsx         # ヘッダー
-│   └── ThemeSwitcher.tsx    # テーマ切替ボタン
-│
-├── /lib/
-│   └── /data/ 
-│       └── data.ts            # データ読み込み関数
-│
-├── /public/
-│   └── /thumbnails/       # ここにサムネイル画像 (id.pngなど) を置く
-│
-├── /data/
-│   ├── config.json
-│   └── projects.json
-│
-└── types/index.ts         # データ型の定義
+├── /app/             # 各ページ (サーバーコンポーネントのシェル)
+├── /components/      # 共通UIコンポーネント (主にクライアントコンポーネント)
+├── /data/            # ★ サイトコンテンツのJSONデータ
+├── /lib/             # データ取得ロジック
+├── /public/          # ★ 静的ファイル (画像, PDFなど)
+│   ├── /thumbnails/  # ★ 作品のサムネイル画像
+│   └── /contest2025/ # ★ PDF資料の配置例
+├── /@types/          # TypeScriptの型定義
+└── tailwind.config.ts # Tailwind CSSの設定
 ```
 
-### デプロイ
+### アーキテクチャ概要
+本サイトは、Next.js App Routerの思想に基づき、サーバーコンポーネントとクライアントコンポーネントの役割を明確に分離しています。
 
-このプロジェクトはVercelへのデプロイに最適化されています。
+-   **サーバーコンポーネント (`/app/.../page.tsx`)**:
+    -   `params`や`searchParams`といった動的な値には直接アクセスしない。
+    -   役割は、`lib/data.ts` を使って**全てのデータ**を取得し、それをクライアントコンポーネントにpropsとして渡すことのみに専念する「シェル」として機能する。
+    -   これにより、データ取得はサーバーサイドで行われ、静的生成のメリットを最大限に活かす。
+-   **クライアントコンポーネント (`/components/*.tsx`)**:
+    -   `"use client"` を宣言。
+    -   `useParams`や`useSearchParams`フックを使い、URLの動的な値を安全に読み取る。
+    -   親から渡された全データの中から、動的な値に基づいて表示に必要なデータをフィルタリングし、レンダリングする。
+    -   ページネーションやテーマ切り替えなど、インタラクティブなUIを担当する。
+-   **Suspense**:
+    -   `useSearchParams`を使用するクライアントコンポーネントは、ビルド時の静的生成ができない。そのため、親のサーバーコンポーネント側で`<Suspense>`で囲み、フォールバックUI（ローディング表示）を指定することで、ビルドエラーを回避しつつ、スムーズなページ表示を実現している。
+
+### デプロイ
 GitHubリポジトリをVercelに連携させることで、`main` ブランチへのPush時に自動でデプロイが実行されます。
-環境変数の設定は特に必要ありません。
+- **ビルドコマンド**: `npm run build`
+- **環境変数**: 特になし
