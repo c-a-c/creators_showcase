@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main  # メインブランチにプッシュされたときに実行
+      - dev
   workflow_dispatch:  # 手動でワークフローを実行可能にする
 
 jobs:
