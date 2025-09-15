@@ -7,7 +7,7 @@ on:
       - dev
   workflow_dispatch:  # 手動でワークフローを実行可能にする
 
-  permissions:
+permissions:
   contents: read
   pages: write
   id-token: write
