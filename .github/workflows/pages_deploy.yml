@@ -7,6 +7,11 @@ on:
       - dev
   workflow_dispatch:  # 手動でワークフローを実行可能にする
 
+  permissions:
+  contents: read
+  pages: write
+  id-token: write
+
 jobs:
   build:
     name: Build
