@@ -2,3 +2,8 @@ pages/2025-siki/salmon/Build/*.data* filter=lfs diff=lfs merge=lfs -text
 pages/2025-siki/salmon/Build/*.framework.js* filter=lfs diff=lfs merge=lfs -text
 pages/2025-siki/salmon/Build/*.wasm* filter=lfs diff=lfs merge=lfs -text
 pages/2025-siki/salmon/Build/*.unityweb filter=lfs diff=lfs merge=lfs -text
+
+pages/2025-siki/salmon2/Build/*.data* filter=lfs diff=lfs merge=lfs -text
+pages/2025-siki/salmon2/Build/*.framework.js* filter=lfs diff=lfs merge=lfs -text
+pages/2025-siki/salmon2/Build/*.wasm* filter=lfs diff=lfs merge=lfs -text
+pages/2025-siki/salmon2/Build/*.unityweb filter=lfs diff=lfs merge=lfs -text
