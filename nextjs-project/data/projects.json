@@ -11,7 +11,7 @@
     "description": "## 頑張った点\n 3Dゲーム制作に初挑戦。\nCinemeshineやDollyCameraなどのカメラ制御。\nSplineを利用したオブジェクトの移動。\n三人称視点での移動を実装。\nUIのボタンやInputSystemなどのイベント駆動の理解に努め、実装した。\n\n ## 工夫した点\n\n 川を泳いでいる感じにしたかったので、川に触れている時のみ逆方向に力がかかるようにした。また、川の流れに乗っているときは、プレイヤーが操作していなくても少しずつ流されるようにした。\n\n ## 苦労した点\n Unity初心者であり、3Dゲーム制作も初めての挑戦だったため、作りが粗かったり、コードに未熟な点も多いかと思います。\n\n今後もゲーム開発を続け、より良いものを作れるよう努力していきたいので、ぜひ率直で厳しめのご意見をいただけると嬉しいです。\n\n",
     "youtubeId": "WZsKvTRMKk8",
     "websiteUrl": "https://sunshine-724.github.io/creators_showcase/2025-siki/salmon/",
-    "githubUrl": "https://github.com/example/repo",
+    "githubUrl": "https://github.com/yamasaku3907/Salmon",
     "pdfPath": null
   },
   {
