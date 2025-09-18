@@ -155,11 +155,22 @@ YouTube動画がない作品のサムネイルは、手動でフォルダにア�
 ```
 /data/config.json
 ```
+
+**設定項目:**
+-   `contestName`: コンテストの正式名称。
+-   `eventDate`: 開催日など。
+-   `description`: トップページに表示される説明文（Markdown対応）。
+-   `googleFormUrl`: トップページに表示される「評価フォームへ」ボタンのリンク先URL。不要な場合は`null`または空文字`""`にするとボタンが非表示になります。
+-   `driveDownloadUrl`: 「ローカル動作用ファイル」ボタンのリンク先となるGoogleドライブなどのURL。不要な場合は`null`または空文字`""`にするとボタンが非表示になります。
+
+**記述例:**
 ```json:data/config.json
 {
   "contestName": "プログラミングコンテスト 2025",
   "eventDate": "2025年10月26日",
-  "description": "## 開催概要\n年に一度の**プログラミングコンテスト**の作品展示サイトです。\n素晴らしい作品の数々をご覧ください。"
+  "description": "## 開催概要\n年に一度の**プログラミングコンテスト**の作品展示サイトです。\n素晴らしい作品の数々をご覧ください。",
+  "googleFormUrl": "https://forms.gle/your-form-url-here"
+  "driveDownloadUrl": "https://drive.google.com/drive/folders/your-folder-id-here"
 }
 ```
 

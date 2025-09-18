@@ -2,6 +2,8 @@ export interface Config {
   contestName: string;
   eventDate: string;
   description: string;
+  googleFormUrl: string | null;
+  driveDownloadUrl: string | null; 
 }
 
 export interface Project {
