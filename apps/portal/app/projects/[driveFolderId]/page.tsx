@@ -91,6 +91,7 @@ export default async function ProjectDetailPage({
   const resolvedDetail = detail;
 
   const { meta, primaryPdf, primaryVideo, primaryThumb, assets } = resolvedDetail;
+  const websiteUrl = meta.websiteUrl?.trim() ?? null;
 
   const listedAssets = assets.filter(
     (asset: (typeof assets)[number]) =>
@@ -116,6 +117,19 @@ export default async function ProjectDetailPage({
             ))}
           </div>
         ) : null}
+
+        {websiteUrl && (
+          <div className="mt-6">
+            <a
+              href={websiteUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center px-5 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700"
+            >
+              作品サイトを開く
+            </a>
+          </div>
+        )}
       </header>
 
       {primaryThumb || meta.thumb ? (
@@ -154,11 +168,11 @@ export default async function ProjectDetailPage({
               </li>,
             );
           }
-          if (meta.websiteUrl?.trim()) {
+          if (websiteUrl) {
             links.push(
               <li key="website">
-                <a href={meta.websiteUrl} target="_blank" rel="noopener noreferrer" className="hover:underline">
-                  Website: {meta.websiteUrl}
+                <a href={websiteUrl} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                  作品サイト: {websiteUrl}
                 </a>
               </li>,
             );

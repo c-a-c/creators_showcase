@@ -9,8 +9,8 @@ const ITEMS_PER_PAGE = 25;
 const FALLBACK_THUMBNAIL = "data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=";
 
 function ProjectCard({ project }: { project: ProjectListItem }) {
-  const isInternal = Boolean(project.driveFolderId);
-  const href = isInternal
+  const hasDetailPage = Boolean(project.driveFolderId);
+  const href = hasDetailPage
     ? `/projects/${project.driveFolderId}`
     : project.websiteUrl ?? "#";
 
@@ -38,11 +38,27 @@ function ProjectCard({ project }: { project: ProjectListItem }) {
     </div>
   );
 
-  if (isInternal) {
+  const websiteLink = project.websiteUrl ? (
+    <p className="mt-3 text-sm">
+      <a
+        href={project.websiteUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-blue-600 dark:text-blue-400 hover:underline"
+      >
+        作品サイト
+      </a>
+    </p>
+  ) : null;
+
+  if (hasDetailPage) {
     return (
-      <Link href={href} className="h-full">
-        {cardContent}
-      </Link>
+      <div className="h-full">
+        <Link href={href} className="block h-full">
+          {cardContent}
+        </Link>
+        {websiteLink}
+      </div>
     );
   }
 
@@ -83,7 +99,7 @@ export default function ProjectList({ projects }: { projects: ProjectListItem[] 
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {paginatedProjects.map((project, index) => {
-            const key = project.id ?? project.driveFolderId ?? project.websiteUrl ?? `project-${index}`;
+            const key = project.driveFolderId ?? project.websiteUrl ?? `project-${index}`;
             return (
               <div key={key} className="h-full">
                 <ProjectCard project={project} />
