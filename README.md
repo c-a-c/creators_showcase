@@ -1,60 +1,132 @@
-# プログラミングコンテスト作品展示サイト Repository
+# Creators Showcase Monorepo  
+## C.A.C プログラミングコンテスト 作品展示サイト
 
-ようこそ！このリポジトリは、「プログラミングコンテスト作品展示サイト」プロジェクトの全てを管理するモノリポです。
-このプロジェクトは、作品を紹介する**フロントエンドサイト（Next.js）**と、ブラウザで遊べるゲームなどの**静的コンテンツ（Unity WebGLなど）**の2つの主要な要素で構成されています。
-
--   **フロントエンドデプロイ先 (Vercel):** [https://creatorsshowcase.vercel.app/](https://creatorsshowcase.vercel.app/)
--   **静的コンテンツデプロイ先 (GitHub Pages):** [https://sunshine-724.github.io/creators_showcase/](https://sunshine-724.github.io/creators_showcase/)
+このリポジトリは、C.A.C プログラミングコンテストにおける **作品展示サイト** を運営するための **モノレポ (Monorepo)** です。  
+ポータルサイト、年度別作品アプリ、外部ホスティングされたアセットを統合的に管理します。
 
 ---
 
-## リポジトリ構成
+## 🎯 コンセプト
 
-このリポジトリは、以下の2つの主要なディレクトリで構成されています。
-<pre>
+- アプリケーションコードは **`apps/`** に集約
+- 作品データ・動画・WebGL などの大容量アセットは **Google Drive / 外部ホスティングで管理**
+- ポータルサイトは **Google Drive API から作品情報 (JSON) を取得して表示**
+
+---
+
+## 📂 リポジトリ構成
+
+```
 .
-├── nextjs-project/ (作品紹介サイト本体)
-└── pages/ (GitHub Pagesでホスティングする静的コンテンツ)
-</pre>
-
-[### 📁 `nextjs-project/`](./nextjs-project/README.md)
-作品情報を一覧表示したり、詳細を説明したりするためのポータルサイトです。Next.js (App Router) で構築されており、Vercelにデプロイされます。
-詳細は [`nextjs-project/README.md`](./nextjs-project/README.md) をご覧ください。
-
-[### 📁 `pages/`](./pages/README.md)
-UnityのWebGLビルドなど、静的なウェブコンテンツを配置するためのディレクトリです。このディレクトリの内容は、GitHub Actionsによって自動的にGitHub Pagesにデプロイされます。
-詳細は [`pages/README.md`](./pages/README.md) をご覧ください。
-
----
-
-## プロジェクトの追加・更新ワークフロー
-
-新しい作品を追加する際の基本的な流れは以下の通りです。
-
-1.  **静的コンテンツの配置 (必要な場合):**
-    -   Unityビルドなどの静的コンテンツがある場合は、[`pages/`](./pages/)ディレクトリ内にルールに従ったフォルダを作成して配置します。
-    -   変更をPushすると、GitHub Actionsが自動でGitHub Pagesにデプロイします。デプロイされたURLを控えておきます。
-
-2.  **フロントエンドの情報更新:**
-    -   [`nextjs-project/data/projects.json`](./nextjs-project/data/projects.json) に新しい作品情報を追記します。この際、ステップ1で取得したURLを[`description`](./nextjs-project/README.md#b-作品を追加編集する方法-dataprojectsjson)などに含めます。
-    -   必要であれば、[`nextjs-project/public/thumbnails/`](./nextjs-project/public/thumbnails/) にサムネイル画像を追加します。
-    -   変更をPushすると、Vercelが自動でサイトを更新します。
+├── apps/
+│   ├── portal/               # 作品ポータルサイト (Next.js App Router)
+│   └── contest/              # 年度別・作品別の個別アプリ
+│       ├── 2025/
+│       │   ├── contest-nextjs-sample/   # Next.js 作品例
+│       │   └── contest-static-sample/   # 静的サイト作品例
+│       └── 2026/
+│           └── .gitkeep
+│
+├── pages/                    # 旧 GitHub Pages ビルド (段階的に廃止予定)
+├── memo.md                   # アーキテクチャ草案メモ
+└── README.md                 # 本ドキュメント
+```
 
 ---
 
-## デプロイ環境について
+## 🌐 Portal (apps/portal)
 
-このリポジトリでは、コンテンツの種類に応じてデプロイ先を分けています。
+Next.js (App Router) により構築された作品一覧・詳細ビューのポータルサイトです。  
+作品のメタデータはすべて **Google Drive から動的に取得**します。
 
-### 静的サイトのデプロイ
-Unity WebGLビルドやプレーンなHTML/CSS/JSで構成される静的サイトは、原則として[`pages`](./pages/)ディレクトリに配置してください。GitHub Actionsが自動でビルドとGitHub Pagesへのデプロイを行います。
+- Drive 用テンプレートは `apps/portal/templates/drive/` に配置しています（`config.json` / `project.json`）。
+- `apps/portal/lib/data/data.ts` が Drive 直下のフォルダを走査し、`project.json` の有無に応じて作品一覧を自動生成します。
+- サムネイルは `project.json` の `thumb` またはフォルダ内の最初の画像ファイルから自動解決します。`videoUrl` / `pdfUrl` などのパスは作品フォルダ内の相対パスとして記述します。
+- Drive 上の権限やアクセス状況を確認するための診断コマンド `npm run drive:debug -- --file <FILE_ID>` を追加しています。
 
-### 動的サイト・その他プラットフォーム
-サーバーサイドの処理を必要とする動的サイトや、Vercel/GitHub Pages以外のプラットフォーム（Heroku, Netlify, etc.）でホスティングしたいプロジェクトについては、**原則としてコントリビューター各自もしくはP班チーフがデプロイ環境を準備してください。**
-準備したURLを、[`nextjs-project/data/projects.json`](./nextjs-project/data/projects.json)の[`websiteUrl`](./nextjs-project/README.md#b-作品を追加編集する方法-dataprojectsjson)や[`description`](./nextjs-project/README.md#b-作品を追加編集する方法-dataprojectsjson)に記述することで、ショーケースサイトからリンクさせることができます。
+### セットアップ
+
+1. `.env.example` を `.env.local` にコピーし、必要な環境変数を設定
+   ```
+   # Google サービスアカウントは JSON 文字列または base64 文字列で設定
+   GOOGLE_SERVICE_ACCOUNT_JSON=
+   GOOGLE_SERVICE_ACCOUNT_JSON_BASE64=
+
+   DRIVE_FOLDER_ID_MASTER=
+   DRIVE_FOLDER_ID_PROTOTYPE=
+   DRIVE_DATA_STAGE=master   # または prototype
+   ```
+   ※ base64 化した JSON (`cat service-account.json | base64 -w0`) を設定する運用を推奨します。
+
+2. 起動
+   ```
+   cd apps/portal
+   npm install
+   npm run dev
+   ```
 
 ---
 
-## 大規模ファイルの管理 (Git LFS)
-[`pages/`](./pages/)ディレクトリでは、Unityのビルドファイルなど、ギガバイト級の巨大なバイナリファイルを扱う可能性があります。これらのファイルは、Git LFS (Large File Storage) を使って管理することを推奨します。
-詳細は [`pages/README.md`](./pages/README.md) を参照してください。
+## 📦 Google Drive データ構造
+
+ポータルは Drive から以下の構成でデータを取得します。
+
+```
+(config.json)                   # サイト全体設定
+
+<project-folder>/               # 各作品フォルダ (Drive の任意のサブフォルダ)
+   ├─ project.json              # 作品詳細情報
+   ├─ screenshot.png            # サムネイル候補
+   ├─ demo.mp4                  # 動画
+   └─ docs.pdf                  # 資料 など
+```
+
+| ファイル名     | 内容                                                |
+| -------------- | --------------------------------------------------- |
+| `config.json`  | サイト名称・説明・リンク類など                      |
+| `project.json` | 作品タイトル・説明文・添付ファイル情報              |
+| その他ファイル | 詳細ページ上に自動的にプレビュー / ダウンロード表示 |
+
+---
+
+## 🕹 Contest Apps (apps/contest)
+
+- **年度ごと** + **作品ごと** にディレクトリを分割
+- 各作品は **独立した Vercel プロジェクト** としてデプロイ可能
+- Next.js / HTML / Unity WebGL / Scratch など制作形式を問わない
+
+| 種類                                  | デプロイ方法                            |
+| ------------------------------------- | --------------------------------------- |
+| Next.js 作品                          | Vercel でビルド                         |
+| HTML / JS / Unity WebGL               | 静的サイトとして Vercel or GitHub Pages |
+| 外部配信作品 (Scratch / Unityroom 等) | ポータルから外部 URL としてリンク       |
+
+---
+
+## 🔧 ブランチ運用ルール
+
+```
+作業ブランチ   ->  feature/<topic>
+ベースブランチ ->  release/v2.0
+マージ先       ->  release/v2.0 へ PR
+```
+
+---
+
+## 🚀 デプロイ戦略
+
+| 対象                      | デプロイ先               | 備考                                 |
+| ------------------------- | ------------------------ | ------------------------------------ |
+| Portal                    | Vercel (apps/portal)     | Drive 認証情報は Vercel Secrets 管理 |
+| Contest Apps              | Vercel (apps/contest/**) | 作品ごとに独立デプロイ               |
+| Unity 等の静的ビルド (旧) | GitHub Pages (`pages/`)  | 段階的に廃止予定                     |
+
+---
+
+## 📌 今後の移行プラン
+
+- 旧 `pages/` のコンテンツを順次 `apps/contest/` または Google Drive へ移行
+- `project.json` スキーマの統一と命名ルールの整理
+- CI (lint / test) をアプリ単位で導入
+
+---
