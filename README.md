@@ -39,9 +39,10 @@
 Next.js (App Router) により構築された作品一覧・詳細ビューのポータルサイトです。  
 作品のメタデータはすべて **Google Drive から動的に取得**します。
 
-- Drive 用テンプレートは `apps/portal/templates/drive/` に配置しています（`config.json` / `projects.json` / `project.json`）。
-- `projects.json` の `driveFolderId` と `websiteUrl` は片方のみ設定する排他仕様です。Drive フォルダを持つ作品は `driveFolderId`、外部ホスティング作品は `websiteUrl` を使用します。
-- サムネイルは `thumbnailFileId`（Drive ファイル ID）もしくは詳細側の `thumb` フィールドで指定し、`videoUrl` / `pdfUrl` などのパスは作品フォルダ内の相対パスとして記述します。
+- Drive 用テンプレートは `apps/portal/templates/drive/` に配置しています（`config.json` / `project.json`）。
+- `apps/portal/lib/data/data.ts` が Drive 直下のフォルダを走査し、`project.json` の有無に応じて作品一覧を自動生成します。
+- サムネイルは `project.json` の `thumb` またはフォルダ内の最初の画像ファイルから自動解決します。`videoUrl` / `pdfUrl` などのパスは作品フォルダ内の相対パスとして記述します。
+- Drive 上の権限やアクセス状況を確認するための診断コマンド `npm run drive:debug -- --file <FILE_ID>` を追加しています。
 
 ### セットアップ
 
@@ -73,21 +74,19 @@ Next.js (App Router) により構築された作品一覧・詳細ビューの�
 
 ```
 (config.json)                   # サイト全体設定
-(projects.json)                 # 作品一覧
 
-<driveFolderId>/                # 各作品フォルダ
-  ├─ project.json              # 作品詳細情報
-  ├─ screenshot.png            # サムネイル等
-  ├─ demo.mp4                  # 動画
-  └─ docs.pdf                  # 資料 など
+<project-folder>/               # 各作品フォルダ (Drive の任意のサブフォルダ)
+   ├─ project.json              # 作品詳細情報
+   ├─ screenshot.png            # サムネイル候補
+   ├─ demo.mp4                  # 動画
+   └─ docs.pdf                  # 資料 など
 ```
 
-| ファイル名      | 内容                                                |
-| --------------- | --------------------------------------------------- |
-| `config.json`   | サイト名称・説明・リンク類など                      |
-| `projects.json` | 作品リスト (`driveFolderId` か `websiteUrl` を指定) |
-| `project.json`  | 作品タイトル・説明文・添付ファイル情報              |
-| その他ファイル  | 詳細ページ上に自動的にプレビュー / ダウンロード表示 |
+| ファイル名     | 内容                                                |
+| -------------- | --------------------------------------------------- |
+| `config.json`  | サイト名称・説明・リンク類など                      |
+| `project.json` | 作品タイトル・説明文・添付ファイル情報              |
+| その他ファイル | 詳細ページ上に自動的にプレビュー / ダウンロード表示 |
 
 ---
 
