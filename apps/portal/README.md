@@ -49,13 +49,30 @@ http://localhost:3000
 ```
 DRIVE_ROOT/
 ├── config.json        # サイト全体設定
-├── projects.json      # 作品一覧
-├── project-a/         # 作品フォルダ
-│   ├── project.json   # 個別作品データ
+├── projects.json      # 作品一覧 (サマリ)
+├── <driveFolderId>/   # 作品フォルダ
+│   ├── project.json   # 個別作品メタデータ
 │   ├── docs/...
-│   └── video/...
-└── project-b/
+│   └── media/...
+└── ...
 ```
+
+- `config.json` / `projects.json` / `project.json` はすべて **Google Drive 上で管理**します。リポジトリにはテンプレートのみを保持します。
+- 作品フォルダ内に格納したファイル（PDF, 画像, 動画など）は、自動的に詳細ページへ一覧表示されます。
+- `project.json` の `videoUrl` / `pdfUrl` などのパスは、作品フォルダ内に対する相対パス（例: `"./docs/overview.pdf"`）で記述します。
+
+## Google Drive テンプレート
+
+初期データを作成する際は、リポジトリ内のテンプレートを利用できます。
+
+```
+apps/portal/templates/drive/
+├── config.json    # サイト設定の雛形
+├── projects.json  # 作品一覧の雛形
+└── project.json   # 個別作品詳細の雛形
+```
+
+テンプレートを Drive にコピーし、`prototype` 用 / `master` 用のフォルダへ配置した上で値を編集してください。
 
 ---
 
@@ -78,28 +95,65 @@ apps/portal/
 ---
 
 ## サイト運営者向けガイド
-このサイトは JSON ファイルと添付ファイルを更新するだけで、作品の追加・更新が可能です。
+ポータルは Google Drive を “ヘッドレス CMS” として利用します。JSON を編集し、作品フォルダへファイルを追加するだけで更新が反映されます。
 
-### A. 基本フロー
-1. `projects.json` や `config.json` を編集
-2. 必要に応じてサムネイル画像・PDF を配置
-3. GitHub に Push
-4. 自動デプロイでサイト反映
+### A. 更新フロー（推奨）
+1. Drive の `prototype` データセットで `config.json` / `projects.json` / 各 `project.json` を編集し、内容をレビューします。
+2. 必要な PDF や動画、スクリーンショットを作品フォルダにアップロードします。
+3. 変更内容が確認できたら `master` データセットへコピーまたは反映します。
+4. Vercel 側の `DRIVE_DATA_STAGE` が `master` に設定されていれば、数分で本番サイトへ反映されます。
 
-### B. 作品の追加・編集 (`projects.json`)
-- 各作品は `id`, `title`, `description` などを持ちます
-- 表示順は配列の並び順で決まります
+### B. `projects.json` の編集
+`projects.json` は作品サマリの配列です。テンプレートを基に以下のフィールドを設定します。
 
-### C. サムネイル画像
-YouTube 動画がある場合 → 動画サムネイル自動取得
-ない場合 → `/public/thumbnails/<id>.png` などを配置
+| フィールド | 必須 | 説明 |
+| --- | --- | --- |
+| `id` | ✅ | 作品の一意な識別子。Drive フォルダ名とは無関係ですが、URL や履歴管理のため変更は最小限にしてください。 |
+| `title` | ✅ | 作品名。 |
+| `description` | ✅ | 一覧ページで表示する短い説明。Markdown 可。 |
+| `thumbnailFileId` | 任意 | Drive 上にあるサムネイルファイルの ID。設定時は Drive API を通じて自動でサムネイル URL を生成します。 |
+| `driveFolderId` | 任意 | ポータルが内部詳細ページを生成する場合に指定します。`websiteUrl` と同時指定は不可です。 |
+| `websiteUrl` | 任意 | 外部サイトに遷移させる場合に指定します。指定時は `driveFolderId` は `null` にしてください。 |
 
-### D. PDF 資料の追加
-- `pdfPath` に `/public` からの相対パスを記述
-- 説明文から Markdown リンクとして埋め込みも可能
+> `driveFolderId` と `websiteUrl` はどちらか片方のみ設定してください。Drive 内部ページを持たない作品（Unityroom 等）は `websiteUrl` のみで運用します。
 
-### E. サイト設定 (`config.json`)
-- トップページの名称、概要文、フォームリンク等を管理
+### C. `project.json` の編集
+`driveFolderId` を持つ作品には、フォルダ直下に `project.json` を配置します。テンプレートの項目は下記の通りです。
+
+| フィールド | 必須 | 説明 |
+| --- | --- | --- |
+| `title` | ✅ | 作品タイトル。 |
+| `author` | ✅ | 作者名または学籍番号。 |
+| `team` | 任意 | チーム名。 |
+| `category` | 任意 | ゲーム / Web アプリ等の分類。 |
+| `repoUrl` | ✅ | ソースコードリポジトリ。 |
+| `websiteUrl` / `artifactUrl` | 任意 | 追加リンク。 |
+| `videoUrl` | 任意 | 作品紹介動画への相対パス (`"./video/demo.mp4"` など)。 |
+| `pdfUrl` | 任意 | 資料 PDF の相対パス (`"./docs/overview.pdf"` など)。 |
+| `description` | ✅ | Markdown で書ける詳細説明。 |
+| `efforts` / `ingenuity` | ✅ | 力を入れた点・工夫点。 |
+| `techStack` | 任意 | 使用技術の配列。 |
+| `licenseNotes` | 任意 | 利用素材の注意書きなど。 |
+
+相対パスで指定されたファイルは、Drive 上で該当パスに存在する場合にのみ「主動画」「主PDF」として扱われます。その他のファイルは MIME Type ごとに自動でリスト化され、閲覧／ダウンロードリンクが生成されます。
+
+### D. サムネイルと静的アセット
+- `thumbnailFileId` を指定すると、Drive からサムネイル画像の共有リンクを生成します。
+- サムネイルを Drive で管理せず、外部 URL を使う場合は `project.json` の `thumb` フィールドを利用できます。
+- 旧 `/public/thumbnails` や `/public/contestXXXX` への配置は不要です。すべて Drive 内にまとめてください。
+
+### E. サイト全体設定 (`config.json`)
+テンプレートのフィールドは以下の通りです。
+
+| フィールド | 必須 | 説明 |
+| --- | --- | --- |
+| `contestName` | ✅ | サイトに表示するコンテスト名。 |
+| `eventDate` | ✅ | 開催日など。 |
+| `description` | ✅ | トップページのリード文（Markdown 可）。 |
+| `googleFormUrl` | 任意 | アンケート等への導線。`null` の場合は表示しません。 |
+| `driveDownloadUrl` | 任意 | 作品一括ダウンロードなど Drive フォルダへのリンク。 |
+
+更新後は Drive 上で保存するだけで OK です。Git 側に JSON をコミットする必要はありません。
 
 ---
 

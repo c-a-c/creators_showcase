@@ -39,6 +39,10 @@
 Next.js (App Router) により構築された作品一覧・詳細ビューのポータルサイトです。  
 作品のメタデータはすべて **Google Drive から動的に取得**します。
 
+- Drive 用テンプレートは `apps/portal/templates/drive/` に配置しています（`config.json` / `projects.json` / `project.json`）。
+- `projects.json` の `driveFolderId` と `websiteUrl` は片方のみ設定する排他仕様です。Drive フォルダを持つ作品は `driveFolderId`、外部ホスティング作品は `websiteUrl` を使用します。
+- サムネイルは `thumbnailFileId`（Drive ファイル ID）もしくは詳細側の `thumb` フィールドで指定し、`videoUrl` / `pdfUrl` などのパスは作品フォルダ内の相対パスとして記述します。
+
 ### セットアップ
 
 1. サービスアカウント JSON を配置  
