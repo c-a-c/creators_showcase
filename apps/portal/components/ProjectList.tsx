@@ -82,11 +82,14 @@ export default function ProjectList({ projects }: { projects: ProjectListItem[] 
         </p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {paginatedProjects.map((project) => (
-            <div key={project.id} className="h-full">
-              <ProjectCard project={project} />
-            </div>
-          ))}
+          {paginatedProjects.map((project, index) => {
+            const key = project.id ?? project.driveFolderId ?? project.websiteUrl ?? `project-${index}`;
+            return (
+              <div key={key} className="h-full">
+                <ProjectCard project={project} />
+              </div>
+            );
+          })}
         </div>
       )}
 

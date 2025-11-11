@@ -30,12 +30,12 @@ const getAuth = cache(async () => {
     });
 });
 
-const getDrive = cache(async () => {
+export const getDriveClient = cache(async () => {
     const auth = await getAuth();
     return google.drive({ version: "v3", auth });
 });
 
-async function getAccessToken(): Promise<string> {
+export async function getAccessToken(): Promise<string> {
     const auth = await getAuth();
     const client = await auth.getClient();
     const tokenResponse = await client.getAccessToken();
@@ -46,16 +46,54 @@ async function getAccessToken(): Promise<string> {
     return token;
 }
 
-function buildDownloadUrl(fileId: string): string {
-    return `https://drive.google.com/uc?export=download&id=${fileId}`;
+function buildDownloadUrl(fileId: string, resourceKey?: string | null): string {
+    const url = new URL("https://drive.google.com/uc");
+    url.searchParams.set("export", "download");
+    url.searchParams.set("id", fileId);
+    if (resourceKey) {
+        url.searchParams.set("resourcekey", resourceKey);
+    }
+    return url.toString();
 }
 
-function buildViewUrl(fileId: string): string {
-    return `https://drive.google.com/file/d/${fileId}/view`;
+function buildViewUrl(fileId: string, resourceKey?: string | null): string {
+    const url = new URL(`https://drive.google.com/file/d/${fileId}/view`);
+    if (resourceKey) {
+        url.searchParams.set("resourcekey", resourceKey);
+    }
+    return url.toString();
+}
+
+function buildPreviewUrl(fileId: string, resourceKey?: string | null): string {
+    const url = new URL(`https://drive.google.com/file/d/${fileId}/preview`);
+    if (resourceKey) {
+        url.searchParams.set("resourcekey", resourceKey);
+    }
+    return url.toString();
+}
+
+function appendResourceKey(url: string | null | undefined, resourceKey?: string | null): string | null {
+    if (!url) {
+        return null;
+    }
+
+    if (!resourceKey) {
+        return url;
+    }
+
+    try {
+        const parsed = new URL(url);
+        if (!parsed.searchParams.get("resourcekey")) {
+            parsed.searchParams.set("resourcekey", resourceKey);
+        }
+        return parsed.toString();
+    } catch {
+        return url;
+    }
 }
 
 export async function fetchFileByName(folderId: string, fileName: string) {
-    const drive = await getDrive();
+    const drive = await getDriveClient();
     const response = await drive.files.list({
         q: `'${folderId}' in parents and name = '${fileName}' and trashed = false`,
         fields: "files(id, name)",
@@ -99,7 +137,9 @@ export interface DriveFile {
     path: string;
     webViewUrl: string;
     downloadUrl: string;
+    previewUrl: string;
     thumbnailUrl: string | null;
+    resourceKey?: string | null;
 }
 
 interface FolderQueueItem {
@@ -108,7 +148,7 @@ interface FolderQueueItem {
 }
 
 export async function listFilesRecursively(folderId: string): Promise<DriveFile[]> {
-    const drive = await getDrive();
+    const drive = await getDriveClient();
     const result: DriveFile[] = [];
     const queue: FolderQueueItem[] = [{ id: folderId, path: "" }];
 
@@ -120,7 +160,7 @@ export async function listFilesRecursively(folderId: string): Promise<DriveFile[
             const response = await drive.files.list({
                 q: `'${current.id}' in parents and trashed = false`,
                 fields:
-                    "nextPageToken, files(id, name, mimeType, webViewLink, thumbnailLink)",
+                    "nextPageToken, files(id, name, mimeType, webViewLink, webContentLink, thumbnailLink, resourceKey)",
                 pageSize: 1000,
                 pageToken,
                 supportsAllDrives: true,
@@ -141,14 +181,26 @@ export async function listFilesRecursively(folderId: string): Promise<DriveFile[
                     continue;
                 }
 
+                const downloadUrl = appendResourceKey(file.webContentLink, file.resourceKey)
+                    ?? buildDownloadUrl(file.id, file.resourceKey);
+                const webViewUrl = appendResourceKey(file.webViewLink, file.resourceKey)
+                    ?? buildViewUrl(file.id, file.resourceKey);
+                const previewCandidate = file.webViewLink
+                    ? file.webViewLink.replace("/view", "/preview")
+                    : null;
+                const previewUrl = appendResourceKey(previewCandidate, file.resourceKey)
+                    ?? buildPreviewUrl(file.id, file.resourceKey);
+
                 result.push({
                     id: file.id,
                     name: file.name,
                     mimeType: file.mimeType ?? "application/octet-stream",
                     path: currentPath,
-                    webViewUrl: file.webViewLink ?? buildViewUrl(file.id),
-                    downloadUrl: buildDownloadUrl(file.id),
+                    webViewUrl,
+                    downloadUrl,
+                    previewUrl,
                     thumbnailUrl: file.thumbnailLink ?? null,
+                    resourceKey: file.resourceKey ?? null,
                 });
             }
 
@@ -163,17 +215,25 @@ export async function getThumbnailUrl(fileId: string): Promise<string | null> {
     if (!fileId) {
         return null;
     }
-    const drive = await getDrive();
-    const response = await drive.files.get({
-        fileId,
-        fields: "thumbnailLink",
-        supportsAllDrives: true,
-    });
 
-    const thumbnailLink = response.data.thumbnailLink;
-    if (thumbnailLink) {
-        return thumbnailLink;
+    try {
+        const drive = await getDriveClient();
+        const response = await drive.files.get({
+            fileId,
+            fields: "thumbnailLink, webViewLink, resourceKey",
+            supportsAllDrives: true,
+        });
+
+        const { thumbnailLink, webViewLink, resourceKey } = response.data;
+
+        const resolvedThumb = appendResourceKey(thumbnailLink ?? webViewLink, resourceKey);
+        if (resolvedThumb) {
+            return resolvedThumb;
+        }
+
+        return buildViewUrl(fileId, resourceKey);
+    } catch (error) {
+        console.warn(`Failed to resolve thumbnail for file ${fileId}.`, error);
+        return null;
     }
-
-    return buildViewUrl(fileId);
 }

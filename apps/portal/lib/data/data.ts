@@ -85,6 +85,15 @@ export const getProjectList = cache(async (): Promise<ProjectListItem[]> => {
   return Promise.all(summaries.map(enrichProjectSummary));
 });
 
+export async function findProjectSummaryByDriveFolderId(driveFolderId: string): Promise<ProjectListItem | null> {
+  if (!driveFolderId) {
+    return null;
+  }
+
+  const projects = await getProjectList();
+  return projects.find((project) => project.driveFolderId === driveFolderId) ?? null;
+}
+
 function filterOutMetadataFiles(asset: DriveFile): boolean {
   return asset.path !== PROJECT_DETAIL_FILE_NAME;
 }

@@ -21,19 +21,19 @@ export interface ProjectListItem extends ProjectSummary {
 
 export interface ProjectDetailMeta {
   title: string;
-  author: string;
+  author?: string | null;
   team?: string | null;
   category?: string | null;
-  repoUrl: string;
+  repoUrl?: string | null;
   websiteUrl?: string | null;
   artifactUrl?: string | null;
   thumb?: string | null;
   videoUrl?: string | null;
   pdfUrl?: string | null;
-  description: string;
-  efforts: string;
-  ingenuity: string;
-  techStack?: string[];
+  description?: string | null;
+  efforts?: string | null;
+  ingenuity?: string | null;
+  techStack?: string[] | null;
   licenseNotes?: string | null;
 }
 
@@ -44,7 +44,9 @@ export interface DriveAsset {
   path: string;
   webViewUrl: string;
   downloadUrl: string;
+  previewUrl: string;
   thumbnailUrl: string | null;
+  resourceKey?: string | null;
 }
 
 export interface ProjectDetail {

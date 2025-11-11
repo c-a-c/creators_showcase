@@ -1,18 +1,3 @@
 [
-    {
-        "id": "project-a",
-        "title": "PDFと動画の作品",
-        "description": "これはPDFと動画で構成される作品です。",
-        "thumbnailFileId": "drive-file-id",
-        "driveFolderId": "abc123",
-        "websiteUrl": null
-    },
-    {
-        "id": "project-b",
-        "title": "Next.js製作品",
-        "description": "これはVercelでホストされたNext.js作品です。",
-        "thumbnailFileId": "drive-file-id",
-        "driveFolderId": null,
-        "websiteUrl": "https://contest-example.vercel.app"
-    }
+
 ]
