@@ -82,12 +82,12 @@ Next.js (App Router) により構築された作品一覧・詳細ビューの�
   └─ docs.pdf                  # 資料 など
 ```
 
-| ファイル名 | 内容 |
-|---|---|
-| `config.json` | サイト名称・説明・リンク類など |
+| ファイル名      | 内容                                                |
+| --------------- | --------------------------------------------------- |
+| `config.json`   | サイト名称・説明・リンク類など                      |
 | `projects.json` | 作品リスト (`driveFolderId` か `websiteUrl` を指定) |
-| `project.json` | 作品タイトル・説明文・添付ファイル情報 |
-| その他ファイル | 詳細ページ上に自動的にプレビュー / ダウンロード表示 |
+| `project.json`  | 作品タイトル・説明文・添付ファイル情報              |
+| その他ファイル  | 詳細ページ上に自動的にプレビュー / ダウンロード表示 |
 
 ---
 
@@ -97,11 +97,11 @@ Next.js (App Router) により構築された作品一覧・詳細ビューの�
 - 各作品は **独立した Vercel プロジェクト** としてデプロイ可能
 - Next.js / HTML / Unity WebGL / Scratch など制作形式を問わない
 
-| 種類 | デプロイ方法 |
-|---|---|
-| Next.js 作品 | Vercel でビルド |
-| HTML / JS / Unity WebGL | 静的サイトとして Vercel or GitHub Pages |
-| 外部配信作品 (Scratch / Unityroom 等) | ポータルから外部 URL としてリンク |
+| 種類                                  | デプロイ方法                            |
+| ------------------------------------- | --------------------------------------- |
+| Next.js 作品                          | Vercel でビルド                         |
+| HTML / JS / Unity WebGL               | 静的サイトとして Vercel or GitHub Pages |
+| 外部配信作品 (Scratch / Unityroom 等) | ポータルから外部 URL としてリンク       |
 
 ---
 
@@ -117,11 +117,11 @@ Next.js (App Router) により構築された作品一覧・詳細ビューの�
 
 ## 🚀 デプロイ戦略
 
-| 対象 | デプロイ先 | 備考 |
-|---|---|---|
-| Portal | Vercel (apps/portal) | Drive 認証情報は Vercel Secrets 管理 |
-| Contest Apps | Vercel (apps/contest/**) | 作品ごとに独立デプロイ |
-| Unity 等の静的ビルド (旧) | GitHub Pages (`pages/`) | 段階的に廃止予定 |
+| 対象                      | デプロイ先               | 備考                                 |
+| ------------------------- | ------------------------ | ------------------------------------ |
+| Portal                    | Vercel (apps/portal)     | Drive 認証情報は Vercel Secrets 管理 |
+| Contest Apps              | Vercel (apps/contest/**) | 作品ごとに独立デプロイ               |
+| Unity 等の静的ビルド (旧) | GitHub Pages (`pages/`)  | 段階的に廃止予定                     |
 
 ---
 
