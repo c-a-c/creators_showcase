@@ -45,7 +45,7 @@ export default async function Home() {
             rel="noopener noreferrer"
             className="inline-block bg-green-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-green-700 transition-colors"
           >
-            ローカル動作用ファイル
+            ローカル動作用ファイル 
           </a>
         )}
       </div>
