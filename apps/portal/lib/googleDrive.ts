@@ -4,7 +4,7 @@ import path from "path";
 import { promises as fs } from "fs";
 
 const DRIVE_READ_SCOPE = "https://www.googleapis.com/auth/drive.readonly";
-const FOLDER_MIME = "application/vnd.google-apps.folder";
+export const FOLDER_MIME = "application/vnd.google-apps.folder";
 
 function resolveServiceAccountPath(): string {
     const explicitPath = process.env.GOOGLE_SERVICE_ACCOUNT_KEY_PATH;
@@ -142,6 +142,13 @@ export interface DriveFile {
     resourceKey?: string | null;
 }
 
+export interface DriveChildItem {
+    id: string;
+    name: string;
+    mimeType: string;
+    resourceKey?: string | null;
+}
+
 interface FolderQueueItem {
     id: string;
     path: string;
@@ -209,6 +216,42 @@ export async function listFilesRecursively(folderId: string): Promise<DriveFile[
     }
 
     return result;
+}
+
+export async function listFolderChildren(folderId: string): Promise<DriveChildItem[]> {
+    const drive = await getDriveClient();
+    const items: DriveChildItem[] = [];
+    let pageToken: string | undefined;
+
+    do {
+        const response = await drive.files.list({
+            q: `'${folderId}' in parents and trashed = false`,
+            fields: "nextPageToken, files(id, name, mimeType, resourceKey)",
+            pageSize: 1000,
+            pageToken,
+            supportsAllDrives: true,
+            includeItemsFromAllDrives: true,
+            corpora: "allDrives",
+        });
+
+        const files = response.data.files ?? [];
+        for (const file of files) {
+            if (!file.id || !file.name || !file.mimeType) {
+                continue;
+            }
+
+            items.push({
+                id: file.id,
+                name: file.name,
+                mimeType: file.mimeType,
+                resourceKey: file.resourceKey ?? null,
+            });
+        }
+
+        pageToken = response.data.nextPageToken ?? undefined;
+    } while (pageToken);
+
+    return items;
 }
 
 export async function getThumbnailUrl(fileId: string): Promise<string | null> {

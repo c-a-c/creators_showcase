@@ -7,11 +7,9 @@ export interface Config {
 }
 
 export interface ProjectSummary {
-  id: string;
+  driveFolderId: string;
   title: string;
-  description: string;
-  thumbnailFileId: string | null;
-  driveFolderId: string | null;
+  description: string | null;
   websiteUrl: string | null;
 }
 

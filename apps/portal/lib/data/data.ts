@@ -4,17 +4,17 @@ import {
   ProjectDetail,
   ProjectDetailMeta,
   ProjectListItem,
-  ProjectSummary,
 } from "@/types";
 import {
   downloadJsonFile,
-  getThumbnailUrl,
   listFilesRecursively,
+  listFolderChildren,
+  FOLDER_MIME,
   type DriveFile,
+  type DriveChildItem,
 } from "../googleDrive";
 
 const CONFIG_FILE_NAME = "config.json";
-const PROJECTS_FILE_NAME = "projects.json";
 const PROJECT_DETAIL_FILE_NAME = "project.json";
 
 const DRIVE_STAGE_MASTER = "master";
@@ -68,21 +68,63 @@ export const getConfig = cache(async (): Promise<Config> => {
   return downloadJsonFile<Config>(rootFolderId, CONFIG_FILE_NAME);
 });
 
-async function enrichProjectSummary(project: ProjectSummary): Promise<ProjectListItem> {
-  const thumbnailUrl = project.thumbnailFileId
-    ? await getThumbnailUrl(project.thumbnailFileId)
-    : null;
+function safeTrim(value: string | null | undefined): string | null {
+  const trimmed = value?.trim();
+  return trimmed ? trimmed : null;
+}
+
+function filterOutMetadataFiles(asset: DriveFile): boolean {
+  return asset.path !== PROJECT_DETAIL_FILE_NAME;
+}
+
+function pickPrimaryThumbnail(detail: ProjectDetailMeta | null, files: DriveFile[]): DriveFile | undefined {
+  const normalizedThumbPath = normaliseRelativePath(detail?.thumb);
+  if (normalizedThumbPath) {
+    const matched = files.find((file) => file.path === normalizedThumbPath);
+    if (matched) {
+      return matched;
+    }
+  }
+
+  return files.find((file) => file.mimeType.startsWith("image/"));
+}
+
+async function buildProjectListItem(folder: DriveChildItem): Promise<ProjectListItem> {
+  const detail = await downloadJsonFile<ProjectDetailMeta>(folder.id, PROJECT_DETAIL_FILE_NAME).catch(() => null);
+
+  const files = (await listFilesRecursively(folder.id))
+    .filter(filterOutMetadataFiles)
+    .sort((a, b) => a.path.localeCompare(b.path));
+
+  const primaryThumb = pickPrimaryThumbnail(detail, files);
+
+  const title = safeTrim(detail?.title) ?? safeTrim(folder.name) ?? "無題の作品";
+  const description = safeTrim(detail?.description);
+  const websiteUrl = safeTrim(detail?.websiteUrl);
 
   return {
-    ...project,
-    thumbnailUrl,
+    driveFolderId: folder.id,
+    title,
+    description,
+    websiteUrl,
+    thumbnailUrl: primaryThumb ? primaryThumb.thumbnailUrl ?? primaryThumb.downloadUrl : null,
   };
+}
+
+function filterProjectFolders(items: DriveChildItem[]): DriveChildItem[] {
+  return items.filter((item) => item.mimeType === FOLDER_MIME);
 }
 
 export const getProjectList = cache(async (): Promise<ProjectListItem[]> => {
   const rootFolderId = await getRootFolderId();
-  const summaries = await downloadJsonFile<ProjectSummary[]>(rootFolderId, PROJECTS_FILE_NAME);
-  return Promise.all(summaries.map(enrichProjectSummary));
+  const children = await listFolderChildren(rootFolderId);
+  const projectFolders = filterProjectFolders(children);
+
+  if (projectFolders.length === 0) {
+    return [];
+  }
+
+  return Promise.all(projectFolders.map(buildProjectListItem));
 });
 
 export async function findProjectSummaryByDriveFolderId(driveFolderId: string): Promise<ProjectListItem | null> {
@@ -92,10 +134,6 @@ export async function findProjectSummaryByDriveFolderId(driveFolderId: string): 
 
   const projects = await getProjectList();
   return projects.find((project) => project.driveFolderId === driveFolderId) ?? null;
-}
-
-function filterOutMetadataFiles(asset: DriveFile): boolean {
-  return asset.path !== PROJECT_DETAIL_FILE_NAME;
 }
 
 export async function getProjectDetail(driveFolderId: string): Promise<ProjectDetail | null> {
@@ -114,7 +152,6 @@ export async function getProjectDetail(driveFolderId: string): Promise<ProjectDe
 
   const normalizedVideoPath = normaliseRelativePath(detail.videoUrl);
   const normalizedPdfPath = normaliseRelativePath(detail.pdfUrl);
-  const normalizedThumbPath = normaliseRelativePath(detail.thumb);
 
   const findAssetByPath = (targetPath: string | null | undefined) => {
     if (!targetPath) {
@@ -125,11 +162,12 @@ export async function getProjectDetail(driveFolderId: string): Promise<ProjectDe
 
   const primaryVideo = findAssetByPath(normalizedVideoPath);
   const primaryPdf = findAssetByPath(normalizedPdfPath);
-  const primaryThumb = findAssetByPath(normalizedThumbPath);
+  const primaryThumb = pickPrimaryThumbnail(detail, files);
 
+  const fallbackThumbUrl = typeof detail.thumb === "string" ? safeTrim(detail.thumb) : null;
   const resolvedThumb = primaryThumb
     ? primaryThumb.thumbnailUrl ?? primaryThumb.downloadUrl
-    : detail.thumb ?? null;
+    : fallbackThumbUrl;
 
   const enrichedMeta: ProjectDetailMeta = {
     ...detail,
