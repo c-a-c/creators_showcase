@@ -26,7 +26,7 @@ export default async function ProjectDetailPage({
   const detail = await getProjectDetail(params.driveFolderId);
   const resolvedDetail = detail ?? notFound();
 
-  const { meta, primaryPdf, primaryVideo, assets } = resolvedDetail;
+  const { meta, primaryPdf, primaryVideo, primaryThumb, assets } = resolvedDetail;
 
   const listedAssets = assets.filter(
     (asset: (typeof assets)[number]) =>
@@ -54,15 +54,15 @@ export default async function ProjectDetailPage({
         ) : null}
       </header>
 
-      {meta.thumb && (
+      {primaryThumb || meta.thumb ? (
         <div className="mb-8">
           <img
-            src={meta.thumb}
+            src={primaryThumb?.downloadUrl ?? primaryThumb?.thumbnailUrl ?? meta.thumb ?? ""}
             alt={`${meta.title} のサムネイル`}
             className="rounded-lg shadow-md max-h-80 w-full object-cover"
           />
         </div>
-      )}
+      ) : null}
 
       <DetailSection title="作品概要">
         <ReactMarkdown remarkPlugins={[remarkGfm]}>{meta.description}</ReactMarkdown>

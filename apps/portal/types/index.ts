@@ -52,4 +52,5 @@ export interface ProjectDetail {
   assets: DriveAsset[];
   primaryVideo?: DriveAsset;
   primaryPdf?: DriveAsset;
+  primaryThumb?: DriveAsset;
 }

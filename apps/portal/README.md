@@ -52,6 +52,7 @@ DRIVE_ROOT/
 ├── projects.json      # 作品一覧 (サマリ)
 ├── <driveFolderId>/   # 作品フォルダ
 │   ├── project.json   # 個別作品メタデータ
+│   ├── thumb.png      # ヒーロー画像 (推奨: 1280x720 / 16:9)
 │   ├── docs/...
 │   └── media/...
 └── ...
@@ -120,27 +121,28 @@ apps/portal/
 ### C. `project.json` の編集
 `driveFolderId` を持つ作品には、フォルダ直下に `project.json` を配置します。テンプレートの項目は下記の通りです。
 
-| フィールド                   | 必須 | 説明                                                                                |
-| ---------------------------- | ---- | ----------------------------------------------------------------------------------- |
-| `title`                      | ✅    | 作品タイトル。                                                                      |
-| `author`                     | ✅    | 作者名（Discord 名や学籍番号など運営が把握できる情報）。                            |
-| `team`                       | 任意 | チーム名。                                                                          |
-| `category`                   | 任意 | ゲーム / Web アプリ等の分類。                                                       |
-| `repoUrl`                    | ✅    | ソースコードリポジトリ。                                                            |
-| `websiteUrl` / `artifactUrl` | 任意 | 追加リンク。                                                                        |
-| `thumb`                      | 任意 | Drive 以外の外部画像 URL を使いたい場合に指定。`thumbnailFileId` より優先されます。 |
-| `videoUrl`                   | 任意 | 作品紹介動画への相対パス (`"./video/demo.mp4"` など)。                              |
-| `pdfUrl`                     | 任意 | 資料 PDF の相対パス (`"./docs/overview.pdf"` など)。                                |
-| `description`                | ✅    | Markdown で書ける詳細説明。                                                         |
-| `efforts` / `ingenuity`      | ✅    | 力を入れた点・工夫点。                                                              |
-| `techStack`                  | 任意 | 使用技術の配列。                                                                    |
-| `licenseNotes`               | 任意 | 利用素材の注意書きなど。                                                            |
+| フィールド                   | 必須 | 説明                                                                                                  |
+| ---------------------------- | ---- | ----------------------------------------------------------------------------------------------------- |
+| `title`                      | ✅    | 作品タイトル。                                                                                        |
+| `author`                     | ✅    | 作者名（Discord 名や学籍番号など運営が把握できる情報）。                                              |
+| `team`                       | 任意 | チーム名。                                                                                            |
+| `category`                   | 任意 | ゲーム / Web アプリ等の分類。                                                                         |
+| `repoUrl`                    | ✅    | ソースコードリポジトリ。                                                                              |
+| `websiteUrl` / `artifactUrl` | 任意 | 追加リンク。                                                                                          |
+| `thumb`                      | ✅    | ヒーロー画像へのパス。例: `"thumb.png"`（作品フォルダ直下の画像を指す相対パス）。外部 URL を使う場合は `https://` で始まる絶対 URL。 |
+| `videoUrl`                   | 任意 | 作品紹介動画への相対パス (`"./video/demo.mp4"` など)。                                               |
+| `pdfUrl`                     | 任意 | 資料 PDF の相対パス (`"./docs/overview.pdf"` など)。                                                 |
+| `description`                | ✅    | Markdown で書ける詳細説明。                                                                           |
+| `efforts` / `ingenuity`      | ✅    | 力を入れた点・工夫点。                                                                                |
+| `techStack`                  | 任意 | 使用技術の配列。                                                                                      |
+| `licenseNotes`               | 任意 | 利用素材の注意書きなど。                                                                              |
 
 相対パスで指定されたファイルは、Drive 上で該当パスに存在する場合にのみ「主動画」「主PDF」として扱われます。その他のファイルは MIME Type ごとに自動でリスト化され、閲覧／ダウンロードリンクが生成されます。
 
 ### D. サムネイルと静的アセット
-- `thumbnailFileId` を指定すると、Drive からサムネイル画像の共有リンクを生成します。
-- サムネイルを Drive で管理せず、外部 URL を使う場合は `project.json` の `thumb` フィールドを利用できます。
+- 一覧ページ用のサムネイルは `projects.json` の `thumbnailFileId` を指定して管理します。
+- 詳細ページのヒーロー画像は `project.json` の `thumb` で指定します。基本は作品フォルダ直下に `thumb.png` を置き、相対パスで参照してください（推奨サイズ: 1280x720）。
+- どうしても外部 URL を用いたい場合は `thumb` に絶対 URL を指定しますが、Drive 内で完結させる運用を推奨します。
 - 旧 `/public/thumbnails` や `/public/contestXXXX` への配置は不要です。すべて Drive 内にまとめてください。
 
 ### E. サイト全体設定 (`config.json`)

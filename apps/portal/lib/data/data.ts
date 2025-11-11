@@ -105,6 +105,7 @@ export async function getProjectDetail(driveFolderId: string): Promise<ProjectDe
 
   const normalizedVideoPath = normaliseRelativePath(detail.videoUrl);
   const normalizedPdfPath = normaliseRelativePath(detail.pdfUrl);
+  const normalizedThumbPath = normaliseRelativePath(detail.thumb);
 
   const findAssetByPath = (targetPath: string | null | undefined) => {
     if (!targetPath) {
@@ -115,11 +116,22 @@ export async function getProjectDetail(driveFolderId: string): Promise<ProjectDe
 
   const primaryVideo = findAssetByPath(normalizedVideoPath);
   const primaryPdf = findAssetByPath(normalizedPdfPath);
+  const primaryThumb = findAssetByPath(normalizedThumbPath);
+
+  const resolvedThumb = primaryThumb
+    ? primaryThumb.thumbnailUrl ?? primaryThumb.downloadUrl
+    : detail.thumb ?? null;
+
+  const enrichedMeta: ProjectDetailMeta = {
+    ...detail,
+    thumb: resolvedThumb ?? undefined,
+  };
 
   return {
-    meta: detail,
+    meta: enrichedMeta,
     assets: files,
     primaryVideo,
     primaryPdf,
+    primaryThumb,
   };
 }
