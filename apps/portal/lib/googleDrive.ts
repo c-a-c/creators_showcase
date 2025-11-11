@@ -1,29 +1,29 @@
 import { google } from "googleapis";
 import { cache } from "react";
-import path from "path";
-import { promises as fs } from "fs";
+import { Buffer } from "node:buffer";
 
 const DRIVE_READ_SCOPE = "https://www.googleapis.com/auth/drive.readonly";
 export const FOLDER_MIME = "application/vnd.google-apps.folder";
 
-function resolveServiceAccountPath(): string {
-    const explicitPath = process.env.GOOGLE_SERVICE_ACCOUNT_KEY_PATH;
-    if (explicitPath) {
-        return path.isAbsolute(explicitPath)
-            ? explicitPath
-            : path.join(process.cwd(), explicitPath);
+function readServiceAccountCredentials() {
+    const inlineJson = process.env.GOOGLE_SERVICE_ACCOUNT_JSON;
+    if (inlineJson?.trim()) {
+        return JSON.parse(inlineJson);
     }
-    return path.join(process.cwd(), "service-account.json");
-}
 
-async function readServiceAccountCredentials() {
-    const keyPath = resolveServiceAccountPath();
-    const jsonRaw = await fs.readFile(keyPath, "utf-8");
-    return JSON.parse(jsonRaw);
+    const base64Json = process.env.GOOGLE_SERVICE_ACCOUNT_JSON_BASE64;
+    if (base64Json?.trim()) {
+        const decoded = Buffer.from(base64Json, "base64").toString("utf-8");
+        return JSON.parse(decoded);
+    }
+
+    throw new Error(
+        "Google service account credentials are not configured. Set GOOGLE_SERVICE_ACCOUNT_JSON or GOOGLE_SERVICE_ACCOUNT_JSON_BASE64.",
+    );
 }
 
 const getAuth = cache(async () => {
-    const credentials = await readServiceAccountCredentials();
+    const credentials = readServiceAccountCredentials();
     return new google.auth.GoogleAuth({
         credentials,
         scopes: [DRIVE_READ_SCOPE],

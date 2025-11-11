@@ -46,20 +46,19 @@ Next.js (App Router) により構築された作品一覧・詳細ビューの�
 
 ### セットアップ
 
-1. サービスアカウント JSON を配置  
+1. `.env.example` を `.env.local` にコピーし、必要な環境変数を設定
    ```
-   apps/portal/service-account.json
-   ```
-   ※ `.gitignore` により Git には含まれません。
+   # Google サービスアカウントは JSON 文字列または base64 文字列で設定
+   GOOGLE_SERVICE_ACCOUNT_JSON=
+   GOOGLE_SERVICE_ACCOUNT_JSON_BASE64=
 
-2. `.env.example` を `.env.local` にコピーし、Drive フォルダ ID を設定
-   ```
    DRIVE_FOLDER_ID_MASTER=
    DRIVE_FOLDER_ID_PROTOTYPE=
    DRIVE_DATA_STAGE=master   # または prototype
    ```
+   ※ base64 化した JSON (`cat service-account.json | base64 -w0`) を設定する運用を推奨します。
 
-3. 起動
+2. 起動
    ```
    cd apps/portal
    npm install

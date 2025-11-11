@@ -19,26 +19,26 @@
 
 ## クイックスタート
 
-1. クラブ共有の **サービスアカウント JSON** を以下に配置:
-```
-apps/portal/service-account.json
-```
-
-2. `.env.example` を `.env.local` にコピーし、必要値を設定:
+1. `.env.example` を `.env.local` にコピーし、必要値を設定:
 ```env
+# Google サービスアカウントは JSON 文字列または base64 文字列で設定
+GOOGLE_SERVICE_ACCOUNT_JSON=
+GOOGLE_SERVICE_ACCOUNT_JSON_BASE64=
+
 DRIVE_FOLDER_ID_MASTER="本番データ用フォルダID"
 DRIVE_FOLDER_ID_PROTOTYPE="試作データ用フォルダID (任意)"
 DRIVE_DATA_STAGE="master または prototype"
 ```
+	※ base64 化した JSON (`cat service-account.json | base64 -w0`) を設定する運用を推奨します。
 
-3. 依存関係インストールと開発サーバー起動:
+2. 依存関係インストールと開発サーバー起動:
 ```bash
 cd apps/portal
 npm install
 npm run dev
 ```
 
-4. ブラウザで確認:
+3. ブラウザで確認:
 ```
 http://localhost:3000
 ```
@@ -168,7 +168,7 @@ npm run dev
 
 ## デプロイ
 1. `apps/portal` をルートとして Vercel プロジェクトを作成
-2. 環境変数とサービスアカウント JSON を設定
+2. 環境変数を設定（サービスアカウント JSON は環境変数に登録）
 3. 本番では `DRIVE_DATA_STAGE=master` を使用
 
 ---
