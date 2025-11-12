@@ -90,13 +90,21 @@ export default async function ProjectDetailPage({
 
   const resolvedDetail = detail;
 
-  const { meta, primaryPdf, primaryVideo, primaryThumb, assets } = resolvedDetail;
+  const { meta, primaryPdf, primaryVideo, primaryThumb, primaryArtifact, assets } = resolvedDetail;
   const websiteUrl = meta.websiteUrl?.trim() ?? null;
 
-  const listedAssets = assets.filter(
-    (asset: (typeof assets)[number]) =>
-      asset.id !== primaryPdf?.id && asset.id !== primaryVideo?.id,
-  );
+  const listedAssets = assets.filter((asset) => {
+    if (asset.id === primaryPdf?.id) {
+      return false;
+    }
+    if (asset.id === primaryVideo?.id) {
+      return false;
+    }
+    if (asset.id === primaryArtifact?.id) {
+      return false;
+    }
+    return true;
+  });
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -177,11 +185,16 @@ export default async function ProjectDetailPage({
               </li>,
             );
           }
-          if (meta.artifactUrl?.trim()) {
+          if (primaryArtifact) {
             links.push(
               <li key="artifact">
-                <a href={meta.artifactUrl} target="_blank" rel="noopener noreferrer" className="hover:underline">
-                  Artifact: {meta.artifactUrl}
+                <a
+                  href={primaryArtifact.downloadUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:underline"
+                >
+                  成果物をダウンロード (artifact.zip)
                 </a>
               </li>,
             );

@@ -5,7 +5,6 @@
     "category": "game",
     "repoUrl": "https://github.com/your-org/your-repo",
     "websiteUrl": null,
-    "artifactUrl": null,
     "videoUrl": "./video/sample.mp4",
     "pdfUrl": "./docs/overview.pdf",
     "description": "作品の狙い・ゲームループ・基本操作・使用技術・見どころを2〜5行で具体的に説明してください。",

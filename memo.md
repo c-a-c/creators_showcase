@@ -1,156 +1,183 @@
-プログラミングコンテスト作品展示サイト 新アーキテクチャ仕様書 (v7 - 最終版)
+# プログラミングコンテスト作品展示サイト 新アーキテクチャ仕様書 (v8 - 最終版)
 
-1. 目的
+## 目次
 
-（変更なし。LFS問題, デプロイ煩雑さ, ホスティング属人化の解消）
+1. 目的  
+2. 新アーキテクチャ概要 (ハイブリッド・ヘッドレス構成)  
+3. 【最優先検証事項】Vercelプランとコスト（¥0運用）のテスト  
+　3-1. 検証ステップ  
+4. 各コンポーネントの詳細仕様（検証後）  
+　4-1. コード: Vercelモノリポ (GitHub)  
+　4-2. メタデータ: Google Drive (ヘッドレスCMS)  
+　4-3. apps/portal (ポータルサイト) の動的ロジック  
+　4-4. 特殊な静的ビルド: 外部ホスティング  
+5. 移行による影響（不要になるファイル）  
+6. v8 と v7 の主な違い  
 
-2. 新アーキテクチャ概要 (ハイブリッド・ヘッドレス構成)
+---
+
+## 1. 目的
+
+現行の「creators_showcase」リポジトリが抱える以下のボトルネックを解消し、スケーラビリティと管理性を向上させる。
+
+- **Git LFS問題**: Unityビルドファイル（.data等）の管理によるリポジトリ肥大化と、GitHub PagesのLFS非対応制約。  
+- **デプロイの煩雑さ**: JSONやPDFなど、軽微なメタデータの修正でもNext.jsの再デプロイが必要な点。  
+- **作品ホスティングの属人化**: Next.js/HTML/Unity作品のホスティングが部員各自に委ねられている点を一元化・効率化する。  
+
+---
+
+## 2. 新アーキテクチャ概要 (ハイブリッド・ヘッドレス構成)
 
 Gitリポジトリは「コード」のみを管理し、「メタデータ（情報）」と「特殊な静的ビルド（実行環境）」を完全に分離する。
 
-コード (Vercel Monorepo): Next.js製コード（ポータル, 作品）、静的HTML/CSS製コード。
+### コード (Vercel Monorepo)
+Next.js製コード（ポータル, 作品）および静的HTML/CSS製コードを格納。
 
-メタデータ (Google Drive): Driveのフォルダ構造そのものがデータソースとなる。各作品フォルダ内にproject.json（詳細用）、thumb.png、動画、PDFなどを配置する。
+### メタデータ (Google Drive)
+Driveのフォルダ構造をデータソースとし、各作品フォルダ内に`project.json`（詳細用）や`thumb.png`、動画、PDF、`artifact.zip`などを配置する。
 
-特殊ビルド (外部ホスティング): Unityroom, Scratch など。
+### 特殊ビルド (外部ホスティング)
+Unityroom, Scratchなど、外部サイト上に配置されたビルドをリンクで統合表示する。
 
-3.【最優先検証事項】Vercelプランとコスト（¥0運用）のテスト
+---
 
-（変更なし。OrganizationのPublicリポジトリと個人のHobbyプランでのGit連携・モノリポ運用の検証を推奨）
+## 3. 【最優先検証事項】Vercelプランとコスト（¥0運用）のテスト
 
-4. 各コンポーネントの詳細仕様（検証後）
+**仮説:**  
+「GitHub Organization (c-a-c) が所有するPublicリポジトリ (creators_showcase) は、個人のVercel Hobbyプラン（無料）でGit連携・モノリポ運用が可能である」。
 
-4-1. コード: Vercelモノリポ (GitHub)
+この仮説が正しければ、GitHub ActionsによるAPIデプロイは不要で、Vercelの自動デプロイ機能を無料で活用できる。
 
-（変更なし。apps/portalとapps/contest/...に分離する構成を維持）
+### 3-1. 検証ステップ
 
-ディレクトリ構成:
+1. 代表者がVercel Hobbyアカウントにログイン。  
+2. 「New Project」→「Add GitHub Account or Organization」から`c-a-c` Organizationを連携。  
+3. `creators_showcase`リポジトリを選択してImport。  
+4. 「Upgrade to Team」などの警告が出ないことを確認。  
+5. Root Directory を `apps/portal` に設定してテストデプロイ。  
+6. Hobbyプランのままデプロイ成功すれば仮説は成立。  
 
+> **補足:** Vercelの課金は「Teamプラン作成時」にのみ発生。代表者1名が管理する限り無料運用が可能。  
+
+---
+
+## 4. 各コンポーネントの詳細仕様（検証後）
+
+### 4-1. コード: Vercelモノリポ (GitHub)
+
+#### ディレクトリ構成
+```
 /apps/
-├── portal/            (ポータルサイト本体 - Next.js)
+├── portal/            (ポータルサイト - Next.js)
 │   ├── app/
-│   │   ├── page.tsx                     <-- (★一覧ページ - 動的化)
-│   │   └── projects/[folderId]/
-│   │       └── page.tsx                 <-- (★動的詳細ページ)
-│   │
-│   └── (旧 nextjs-project の中身をここに移動)
+│   │   ├── page.tsx                     <-- 一覧ページ（動的化）
+│   │   └── projects/[folderId]/page.tsx <-- 動的詳細ページ
+│   └── (旧 nextjs-project の中身を移行)
 │
-└── contest/           (作品格納 親フォルダ)
-    ├── 2025/
-    │   ├── contest-nextjs-1/  <-- (Next.js プロジェクト)
-    │   └── contest-html-2/    <-- (静的HTML/CSS/JS 作品)
-    └── ...
+└── contest/           (作品格納)
+		├── 2025/
+		│   ├── contest-nextjs-1/
+		│   └── contest-html-2/
+		└── ...
+```
 
+#### デプロイ設定
+| Vercel Project | Root Directory                     | Framework |
+| -------------- | ---------------------------------- | --------- |
+| Portal         | apps/portal                        | Next.js   |
+| Next.js Game 1 | apps/contest/2025/contest-nextjs-1 | Next.js   |
+| HTML Site 2    | apps/contest/2025/contest-html-2   | Other     |
 
+---
 
-デプロイ (Vercel):
-（変更なし。apps/以下の各プロジェクトを個別のVercelプロジェクトとして設定）
+### 4-2. メタデータ: Google Drive (ヘッドレスCMS)
 
-4-2. メタデータ: Google Drive (ヘッドレスCMS)
+Driveのフォルダ構造を**真のデータソース**とする。
 
-ポータルサイト（apps/portal）が表示するすべてのメタデータは、Google Driveから動的に取得する。
-（★ projects.json（一覧用）は廃止し、Driveのフォルダ構造を正とする）
-
-Google Drive フォルダ構成（例）:
-
+#### 構成例
+```
 /部活Drive/コンテストデータ/
-├── 📄 config.json          (サイト設定ファイル)
-│
-├── 📁 project-A/          (フォルダID: "abc123")
-│   ├── 📄 project.json      (② 作品A・詳細用JSON)
-│   ├── 🖼️ thumb.png        (★一覧・詳細用サムネイル)
-│   ├── 📁 docs/
-│   │   └── 📄 overview.pdf
-│   └── 📁 video/
-│       └── 📄 sample.mp4
-│
-├── 📁 project-B-Unity/    (フォルダID: "xyz789")
-│   ├── 📄 project.json      (② 作品B・詳細用JSON)
-│   ├── 🖼️ thumb.jpg        (★一覧・詳細用サムネイル)
-│   └── ...
-│
-└── 📁 project-C-Nextjs/   (フォルダID: "qwe456")
-    ├── 📄 project.json      (② 作品C・詳細用JSON)
-    ├── 🖼️ thumb.png        (★一覧・詳細用サムネイル)
-    └── ...
+├── config.json
+├── project-A/
+│   ├── project.json
+│   ├── thumb.png
+│   ├── artifact.zip
+│   ├── docs/overview.pdf
+│   └── video/sample.mp4
+└── project-B-Unity/
+		├── project.json
+		└── thumb.jpg
+```
 
-
-
-project.json (② 詳細用) のひな形 (例):
-（各作品フォルダ（例: project-A/）内に配置するproject.jsonのひな形）
-（★ id および thumb フィールドを削除）
-
+#### `project.json` テンプレート
+```json
 {
-  "title": "Sample Game(必須)",
-  "author": "学籍番号1234567(必須)",
-  "team": "チーム名 or 個人(任意)",
-  "category": "game | webapp | mobile | other(任意)",
-  "repoUrl": "[https://github.com/your-org/your-repo(必須](https://github.com/your-org/your-repo(必須))",
-  "websiteUrl": "(任意)",
-  "artifactUrl": "(任意)",
-  "videoUrl": "./video/sample.mp4(必須)",
-  "pdfUrl": "./docs/overview.pdf(任意)",
-  "description": "作品の狙い・ゲームループ・基本操作・使用技術・見どころを2〜5行で具体的に説明してください。(必須)",
-  "efforts": "特に時間をかけて取り組んだ点を2〜3行で説明してください。（例: 調整や検証、難所の突破など）(必須)",
-  "ingenuity": "工夫した点や独自性を2〜3行で説明してください。（例: 設計、アルゴリズム、データ構造、最適化戦略など）(必須)",
-  "techStack": ["Unity", "Next.js"],
-  "licenseNotes": "使用素材やライセンスに関する注意点(任意)"
+	"title": "作品名",
+	"team": "チーム名または個人",
+	"category": "game | webapp | mobile | other",
+	"repoUrl": "https://github.com/c-a-c/your-repo",
+	"websiteUrl": null,
+	"thumb": "./thumb.png",
+	"videoUrl": "./video/introduction.mp4",
+	"pdfUrl": "./docs/overview.pdf",
+	"description": "作品概要...",
+	"efforts": "時間をかけた点...",
+	"ingenuity": "工夫した点...",
+	"techStack": ["Unity", "C#", "Next.js", "TypeScript"],
+	"licenseNotes": "使用素材やライセンスに関する注意点"
 }
+```
 
+---
 
-4-3. apps/portal (ポータルサイト) の動的ロジック
+### 4-3. apps/portal (ポータルサイト) の動的ロジック
 
-ポータルサイトは、Next.js (TypeScript) のApp Routerを最大限に活用し、Google Drive API（googleapis）を呼び出す。
+#### 1. 一覧ページ (`app/page.tsx`)
 
-1. apps/portal/app/page.tsx (一覧ページ) (★ロジック大幅変更)
+- Drive API (`files.list`) を叩き、全フォルダを列挙。  
+- 各フォルダの`project.json`と`thumb.png`を並列取得。  
+- `title`, `description`, `websiteUrl`, `thumb`を一覧としてレンダリング。  
+- `websiteUrl`が存在する場合は外部リンク、それ以外は`/projects/[folderId]`への内部リンク。
 
-役割: Driveのフォルダ構成をスキャンし、全作品のリストを動的に生成・表示する。
+#### 2. 詳細ページ (`app/projects/[folderId]/page.tsx`)
 
-動作:
+- `folderId`を元にDrive APIでフォルダ内容を取得。  
+- `project.json`を解析し、`docs/overview.pdf`や`video/sample.mp4`を取得。  
+- MIMEタイプを判定し、表示可能ファイルは「表示」、すべてに「ダウンロード」ボタンを付与。  
+- `artifact.zip`が存在すれば「ダウンロード用成果物」ボタンを表示。  
 
-サーバーコンポーネントがDrive APIを叩き、/コンテストデータ/直下にある全フォルダをリストアップします（files.list）。
+---
 
-取得した各フォルダ（例: project-A, project-B...）に対し、Promise.allなどを使用して、各フォルダ内のproject.json（詳細用）とthumb.png（またはthumb.jpg）を並列で取得します。
+### 4-4. 特殊な静的ビルド: 外部ホスティング
 
-（N+1問題が発生しますが、Next.jsのISRキャッシュ（revalidate）でAPI負荷を軽減します）
+対象: Unity WebGL, Scratchなど。
 
-各project.json（詳細用）からtitle、description（一覧表示用に短縮）、websiteUrlを取得します。
+ホスティング先例: Unityroom, Scratch公式サイト。
 
-各フォルダから取得したthumb.pngのFileIDまたはダウンロードリンクを取得します。
+`project.json`の`websiteUrl`に外部URLを記述し、一覧に統合表示する。
 
-取得した情報（title, description, サムネイル, websiteUrl, フォルダID）の配列を使って、一覧ページをレンダリングします。
+---
 
-リンクの振り分け:
+## 5. 移行による影響（不要になるファイル）
 
-もしproject.json（詳細用）にwebsiteUrlが存在すれば（例: Unityroom, Vercelモノリポ作品）、通常の<a>タグでその外部URLにリンクします。
+以下のファイル・ディレクトリは削除対象となる：
 
-もしwebsiteUrlが存在しなければ（nullまたは""）、Next.jsの<Link>コンポーネントで内部の動的詳細ページ（例: /projects/abc123）にリンクします。（abc123はDriveのフォルダID）
+- `pages/` (Unityビルド群)  
+- `.github/workflows/pages_deploy.yml`  
+- `.gitattributes` (Git LFS設定)  
+- `nextjs-project/data/` (旧JSON)  
+- `nextjs-project/public/` (旧アセット全般)  
 
-2. apps/portal/app/projects/[folderId]/page.tsx (動的詳細ページ) (★ID名を変更)
+---
 
-役割: folderId（DriveのフォルダID）で指定されたフォルダの中身（詳細JSON, PDF, 動画）を取得し、動的に表示する。
+## 6. v8 と v7 の主な違い
 
-動作:
+| 項目               | v7                             | v8                                   |
+| ------------------ | ------------------------------ | ------------------------------------ |
+| 成果物リンク       | `artifactUrl` フィールドで指定 | 固定ファイル名 `artifact.zip` を運用 |
+| ダウンロードボタン | 静的記述                       | Drive APIで存在確認して動的表示      |
+| メタデータ構造     | projects.json（一覧用）存在    | Drive構造がデータソースに            |
+| JSON構成           | `artifactUrl` あり             | `artifactUrl` 削除                   |
 
-Next.jsがページのparamsからfolderId（例: abc123）を取得する。
+---
 
-このページのサーバーコンポーネントがDrive APIを叩き、フォルダabc123の中にあるproject.json（詳細用）を取得・解析する。
-
-さらにDrive APIを叩き、フォルダabc123内の全ファイル（docs/overview.pdf, video/sample.mp4, thumb.pngなど）のリストを**mimeType（ファイル種別）と共に**取得する。
-
-取得した情報（詳細な説明文、各ファイルのリスト）を使ってページをレンダリングする。
-
-（実装例）レンダリング時、mimeTypeを判定し、ブラウザ表示可能なファイルには「表示」ボタン、すべてのファイルに「ダウンロード」ボタンを表示する。
-
-4-4. 特殊な静的ビルド: 外部ホスティング
-
-（変更なし。Vercelモノリポ（apps/）で扱えないUnity, Scratchなど）
-
-ホスティング先 (例): Unityroom、Scratch公式サイト
-
-連携: （一覧用JSONは廃止されたため）各作品フォルダのproject.json（詳細用）に、websiteUrl としてUnityroomやScratchのURLを記述する。
-
-5. 移行による影響（不要ファイルの整理状況）
-
-- pages/・workflows/・.gitattributes は削除済み。
-- 旧 data/ や public/ 配下に残る遺物がないか引き続き確認する。
