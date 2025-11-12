@@ -82,11 +82,11 @@ Unityroom, Scratchなど、外部サイト上に配置されたビルドをリ�
 ```
 
 #### デプロイ設定
-| Vercel Project | Root Directory | Framework |
-|----------------|----------------|------------|
-| Portal | apps/portal | Next.js |
-| Next.js Game 1 | apps/contest/2025/contest-nextjs-1 | Next.js |
-| HTML Site 2 | apps/contest/2025/contest-html-2 | Other |
+| Vercel Project | Root Directory                     | Framework |
+| -------------- | ---------------------------------- | --------- |
+| Portal         | apps/portal                        | Next.js   |
+| Next.js Game 1 | apps/contest/2025/contest-nextjs-1 | Next.js   |
+| HTML Site 2    | apps/contest/2025/contest-html-2   | Other     |
 
 ---
 
@@ -172,12 +172,12 @@ Driveのフォルダ構造を**真のデータソース**とする。
 
 ## 6. v8 と v7 の主な違い
 
-| 項目 | v7 | v8 |
-|------|----|----|
-| 成果物リンク | `artifactUrl` フィールドで指定 | 固定ファイル名 `artifact.zip` を運用 |
-| ダウンロードボタン | 静的記述 | Drive APIで存在確認して動的表示 |
-| メタデータ構造 | projects.json（一覧用）存在 | Drive構造がデータソースに |
-| JSON構成 | `artifactUrl` あり | `artifactUrl` 削除 |
+| 項目               | v7                             | v8                                   |
+| ------------------ | ------------------------------ | ------------------------------------ |
+| 成果物リンク       | `artifactUrl` フィールドで指定 | 固定ファイル名 `artifact.zip` を運用 |
+| ダウンロードボタン | 静的記述                       | Drive APIで存在確認して動的表示      |
+| メタデータ構造     | projects.json（一覧用）存在    | Drive構造がデータソースに            |
+| JSON構成           | `artifactUrl` あり             | `artifactUrl` 削除                   |
 
 ---
 
