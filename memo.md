@@ -150,6 +150,7 @@ Next.jsがページのparamsからfolderId（例: abc123）を取得する。
 
 連携: （一覧用JSONは廃止されたため）各作品フォルダのproject.json（詳細用）に、websiteUrl としてUnityroomやScratchのURLを記述する。
 
-5. 移行による影響（不要になるファイル）
+5. 移行による影響（不要ファイルの整理状況）
 
-（変更なし。pages/, workflows/, .gitattributes, 旧data/, 旧public/ が不要になる）
+- pages/・workflows/・.gitattributes は削除済み。
+- 旧 data/ や public/ 配下に残る遺物がないか引き続き確認する。

@@ -27,7 +27,6 @@
 │       └── 2026/
 │           └── .gitkeep
 │
-├── pages/                    # 旧 GitHub Pages ビルド (段階的に廃止予定)
 ├── memo.md                   # アーキテクチャ草案メモ
 └── README.md                 # 本ドキュメント
 ```
@@ -98,7 +97,7 @@ Next.js (App Router) により構築された作品一覧・詳細ビューの�
 | 種類                                  | デプロイ方法                            |
 | ------------------------------------- | --------------------------------------- |
 | Next.js 作品                          | Vercel でビルド                         |
-| HTML / JS / Unity WebGL               | 静的サイトとして Vercel or GitHub Pages |
+| HTML / JS / Unity WebGL               | 静的サイトとして Vercel へデプロイ      |
 | 外部配信作品 (Scratch / Unityroom 等) | ポータルから外部 URL としてリンク       |
 
 ---
@@ -119,13 +118,11 @@ Next.js (App Router) により構築された作品一覧・詳細ビューの�
 | ------------------------- | ------------------------ | ------------------------------------ |
 | Portal                    | Vercel (apps/portal)     | Drive 認証情報は Vercel Secrets 管理 |
 | Contest Apps              | Vercel (apps/contest/**) | 作品ごとに独立デプロイ               |
-| Unity 等の静的ビルド (旧) | GitHub Pages (`pages/`)  | 段階的に廃止予定                     |
 
 ---
 
 ## 📌 今後の移行プラン
 
-- 旧 `pages/` のコンテンツを順次 `apps/contest/` または Google Drive へ移行
 - `project.json` スキーマの統一と命名ルールの整理
 - CI (lint / test) をアプリ単位で導入
 
