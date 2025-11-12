@@ -16,6 +16,7 @@ import {
 
 const CONFIG_FILE_NAME = "config.json";
 const PROJECT_DETAIL_FILE_NAME = "project.json";
+const ARTIFACT_FILE_NAME = "artifact.zip";
 
 const DRIVE_STAGE_MASTER = "master";
 const DRIVE_STAGE_PROTOTYPE = "prototype";
@@ -163,6 +164,12 @@ export async function getProjectDetail(driveFolderId: string): Promise<ProjectDe
   const primaryVideo = findAssetByPath(normalizedVideoPath);
   const primaryPdf = findAssetByPath(normalizedPdfPath);
   const primaryThumb = pickPrimaryThumbnail(detail, files);
+  const primaryArtifact = files.find((file) => {
+    if (file.path === ARTIFACT_FILE_NAME) {
+      return true;
+    }
+    return file.path.endsWith(`/${ARTIFACT_FILE_NAME}`);
+  });
 
   const fallbackThumbUrl = typeof detail.thumb === "string" ? safeTrim(detail.thumb) : null;
   const resolvedThumb = primaryThumb
@@ -180,5 +187,6 @@ export async function getProjectDetail(driveFolderId: string): Promise<ProjectDe
     primaryVideo,
     primaryPdf,
     primaryThumb,
+    primaryArtifact,
   };
 }

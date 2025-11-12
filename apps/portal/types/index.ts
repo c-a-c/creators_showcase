@@ -24,7 +24,6 @@ export interface ProjectDetailMeta {
   category?: string | null;
   repoUrl?: string | null;
   websiteUrl?: string | null;
-  artifactUrl?: string | null;
   thumb?: string | null;
   videoUrl?: string | null;
   pdfUrl?: string | null;
@@ -53,4 +52,5 @@ export interface ProjectDetail {
   primaryVideo?: DriveAsset;
   primaryPdf?: DriveAsset;
   primaryThumb?: DriveAsset;
+  primaryArtifact?: DriveAsset;
 }
