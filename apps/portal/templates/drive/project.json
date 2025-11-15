@@ -1,0 +1,18 @@
+{
+    "title": "Sample Game",
+    "author": "学籍番号1234567",
+    "team": "チーム名 or 個人",
+    "category": "game",
+    "repoUrl": "https://github.com/your-org/your-repo",
+    "websiteUrl": null,
+    "videoUrl": "./video/sample.mp4",
+    "pdfUrl": "./docs/overview.pdf",
+    "description": "作品の狙い・ゲームループ・基本操作・使用技術・見どころを2〜5行で具体的に説明してください。",
+    "efforts": "特に時間をかけて取り組んだ点を2〜3行で説明してください。（例: 調整や検証、難所の突破など）",
+    "ingenuity": "工夫した点や独自性を2〜3行で説明してください。（例: 設計、アルゴリズム、データ構造、最適化戦略など）",
+    "techStack": [
+        "Unity",
+        "Next.js"
+    ],
+    "licenseNotes": "使用素材やライセンスに関する注意点があれば記載してください。"
+}
