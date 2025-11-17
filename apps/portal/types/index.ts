@@ -19,7 +19,6 @@ export interface ProjectListItem extends ProjectSummary {
 
 export interface ProjectDetailMeta {
   title: string;
-  author?: string | null;
   team?: string | null;
   category?: string | null;
   repoUrl?: string | null;

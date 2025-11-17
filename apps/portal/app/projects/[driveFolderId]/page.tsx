@@ -1,5 +1,6 @@
 import { findProjectSummaryByDriveFolderId, getProjectDetail } from "@/lib/data/data";
 import ReactMarkdown from "react-markdown";
+import type { Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -8,6 +9,48 @@ import type { ProjectListItem } from "@/types";
 import Image from "next/image";
 
 export const dynamic = "force-dynamic";
+
+const markdownComponents: Components = {
+  a({ node, ...props }) {
+    const { className, ...rest } = props;
+    const mergedClassName = `text-blue-600 hover:underline dark:text-blue-400 ${className ?? ""}`.trim();
+    return (
+      <a
+        {...rest}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={mergedClassName}
+      />
+    );
+  },
+  table({ node, ...props }) {
+    const { className, ...rest } = props;
+    return (
+      <div className="overflow-x-auto">
+        <table
+          {...rest}
+          className={`min-w-full border border-gray-200 dark:border-gray-700 ${className ?? ""}`.trim()}
+        />
+      </div>
+    );
+  },
+  th({ node, ...props }) {
+    return (
+      <th
+        {...props}
+        className={`border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-700 px-3 py-2 text-left ${props.className ?? ""}`.trim()}
+      />
+    );
+  },
+  td({ node, ...props }) {
+    return (
+      <td
+        {...props}
+        className={`border border-gray-200 dark:border-gray-700 px-3 py-2 align-top ${props.className ?? ""}`.trim()}
+      />
+    );
+  },
+};
 
 function DetailSection({ title, children }: { title: string; children: ReactNode }) {
   return (
@@ -25,7 +68,13 @@ function renderMarkdownOrPlaceholder(value: string | null | undefined, placehold
   if (!trimmed) {
     return <p className="text-gray-500 dark:text-gray-400">{placeholder}</p>;
   }
-  return <ReactMarkdown remarkPlugins={[remarkGfm]}>{trimmed}</ReactMarkdown>;
+  return (
+    <div className="prose prose-neutral dark:prose-invert max-w-none break-words">
+      <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
+        {trimmed}
+      </ReactMarkdown>
+    </div>
+  );
 }
 
 function MissingProjectDetail({ project }: { project: ProjectListItem }) {
@@ -92,6 +141,7 @@ export default async function ProjectDetailPage({
 
   const { meta, primaryPdf, primaryVideo, primaryThumb, primaryArtifact, assets } = resolvedDetail;
   const websiteUrl = meta.websiteUrl?.trim() ?? null;
+  const producer = meta.team?.trim() ?? null;
 
   const listedAssets = assets.filter((asset) => {
     if (asset.id === primaryPdf?.id) {
@@ -111,8 +161,7 @@ export default async function ProjectDetailPage({
       <header className="mb-10">
         <h1 className="text-4xl font-bold mb-3">{meta.title}</h1>
         <div className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
-          <p><strong>作者:</strong> {meta.author?.trim() || "未登録"}</p>
-          {meta.team?.trim() && <p><strong>チーム:</strong> {meta.team}</p>}
+          <p><strong>制作:</strong> {producer || "未登録"}</p>
           {meta.category?.trim() && <p><strong>カテゴリ:</strong> {meta.category}</p>}
         </div>
 
