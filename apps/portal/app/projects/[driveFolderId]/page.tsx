@@ -63,19 +63,7 @@ function DetailSection({ title, children }: { title: string; children: ReactNode
   );
 }
 
-function renderMarkdownOrPlaceholder(value: string | null | undefined, placeholder: string) {
-  const trimmed = value?.trim();
-  if (!trimmed) {
-    return <p className="text-gray-500 dark:text-gray-400">{placeholder}</p>;
-  }
-  return (
-    <div className="prose prose-neutral dark:prose-invert max-w-none break-words">
-      <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
-        {trimmed}
-      </ReactMarkdown>
-    </div>
-  );
-}
+
 
 function MissingProjectDetail({ project }: { project: ProjectListItem }) {
   const thumbnailSrc = project.thumbnailUrl;
@@ -140,8 +128,17 @@ export default async function ProjectDetailPage({
   const resolvedDetail = detail;
 
   const { meta, primaryPdf, primaryVideo, primaryThumb, primaryArtifact, assets } = resolvedDetail;
-  const websiteUrl = meta.websiteUrl?.trim() ?? null;
-  const producer = meta.team?.trim() ?? null;
+  const sanitize = (val: string | null | undefined) => {
+    if (!val) return null;
+    const trimmed = val.trim();
+    if (trimmed.toLowerCase() === "null") return null;
+    return trimmed;
+  };
+
+  const websiteUrl = sanitize(meta.websiteUrl);
+  const producer = sanitize(meta.team);
+  const videoUrl = sanitize(meta.videoUrl);
+  const pdfUrl = sanitize(meta.pdfUrl);
 
   const listedAssets = assets.filter((asset) => {
     if (asset.id === primaryPdf?.id) {
@@ -201,110 +198,131 @@ export default async function ProjectDetailPage({
         </div>
       ) : null}
 
-      <DetailSection title="作品概要">
-        {renderMarkdownOrPlaceholder(meta.description, "作品概要は登録されていません。")}
-      </DetailSection>
-
-      <DetailSection title="取り組みポイント">
-        {renderMarkdownOrPlaceholder(meta.efforts, "取り組みポイントは登録されていません。")}
-      </DetailSection>
-
-      <DetailSection title="工夫した点">
-        {renderMarkdownOrPlaceholder(meta.ingenuity, "工夫した点は登録されていません。")}
-      </DetailSection>
-
-      <DetailSection title="関連リンク">
-        {(() => {
-          const links: ReactNode[] = [];
-          if (meta.repoUrl?.trim()) {
-            links.push(
-              <li key="repo">
-                <a href={meta.repoUrl} target="_blank" rel="noopener noreferrer" className="hover:underline">
-                  GitHub: {meta.repoUrl}
-                </a>
-              </li>,
-            );
-          }
-          if (websiteUrl) {
-            links.push(
-              <li key="website">
-                <a href={websiteUrl} target="_blank" rel="noopener noreferrer" className="hover:underline">
-                  作品サイト: {websiteUrl}
-                </a>
-              </li>,
-            );
-          }
-          if (primaryArtifact) {
-            links.push(
-              <li key="artifact">
-                <a
-                  href={primaryArtifact.downloadUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:underline"
-                >
-                  成果物をダウンロード (artifact.zip)
-                </a>
-              </li>,
-            );
-          }
-          if (primaryPdf) {
-            links.push(
-              <li key="pdf">
-                <a
-                  href={primaryPdf.previewUrl ?? primaryPdf.webViewUrl ?? primaryPdf.downloadUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:underline"
-                >
-                  PDFを見る
-                </a>
-              </li>,
-            );
-          }
-
-          if (links.length === 0) {
-            return <p className="text-gray-500 dark:text-gray-400">関連リンクは登録されていません。</p>;
-          }
-
-          return <ul className="space-y-2 text-blue-500">{links}</ul>;
-        })()}
-      </DetailSection>
-
-      <DetailSection title="動画">
-        {primaryVideo ? (
-          <div className="relative w-full h-[480px]">
-            <iframe
-              src={primaryVideo?.previewUrl ?? primaryVideo?.webViewUrl ?? primaryVideo?.downloadUrl ?? ""}
-              title="作品動画"
-              className="w-full h-full rounded-lg shadow-md border-0"
-              allow="autoplay; encrypted-media"
-              allowFullScreen
-            />
+      {meta.description?.trim() && (
+        <DetailSection title="作品概要">
+          <div className="prose prose-neutral dark:prose-invert max-w-none break-words">
+            <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
+              {meta.description}
+            </ReactMarkdown>
           </div>
-        ) : meta.videoUrl?.trim() ? (
-          <p>指定された動画ファイル ({meta.videoUrl}) を見つけられませんでした。</p>
-        ) : (
-          <p>動画は登録されていません。</p>
-        )}
-      </DetailSection>
+        </DetailSection>
+      )}
 
-      <DetailSection title="資料">
-        {primaryPdf ? (
-          <iframe
-            src={primaryPdf?.previewUrl ?? primaryPdf?.webViewUrl ?? primaryPdf?.downloadUrl ?? ""}
-            title="作品資料"
-            className="w-full h-[640px] border-0 rounded-lg shadow-md"
-          />
-        ) : meta.pdfUrl?.trim() ? (
-          <p>指定されたPDFファイル ({meta.pdfUrl}) を見つけられませんでした。</p>
-        ) : (
-          <p>PDF資料は登録されていません。</p>
-        )}
-      </DetailSection>
+      {meta.efforts?.trim() && (
+        <DetailSection title="取り組みポイント">
+          <div className="prose prose-neutral dark:prose-invert max-w-none break-words">
+            <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
+              {meta.efforts}
+            </ReactMarkdown>
+          </div>
+        </DetailSection>
+      )}
 
-      <DetailSection title="添付ファイル一覧">
-        {listedAssets.length ? (
+      {meta.ingenuity?.trim() && (
+        <DetailSection title="工夫した点">
+          <div className="prose prose-neutral dark:prose-invert max-w-none break-words">
+            <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
+              {meta.ingenuity}
+            </ReactMarkdown>
+          </div>
+        </DetailSection>
+      )}
+
+      {(() => {
+        const links: ReactNode[] = [];
+        if (meta.repoUrl?.trim()) {
+          links.push(
+            <li key="repo">
+              <a href={meta.repoUrl} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                GitHub: {meta.repoUrl}
+              </a>
+            </li>,
+          );
+        }
+        if (websiteUrl) {
+          links.push(
+            <li key="website">
+              <a href={websiteUrl} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                作品サイト: {websiteUrl}
+              </a>
+            </li>,
+          );
+        }
+        if (primaryArtifact) {
+          links.push(
+            <li key="artifact">
+              <a
+                href={primaryArtifact.downloadUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:underline"
+                download
+              >
+                成果物をダウンロード (artifact.zip)
+              </a>
+            </li>,
+          );
+        }
+        if (primaryPdf) {
+          links.push(
+            <li key="pdf">
+              <a
+                href={primaryPdf.previewUrl ?? primaryPdf.webViewUrl ?? primaryPdf.downloadUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:underline"
+              >
+                PDFを見る
+              </a>
+            </li>,
+          );
+        }
+
+        if (links.length === 0) {
+          return null;
+        }
+
+        return (
+          <DetailSection title="関連リンク">
+            <ul className="space-y-2 text-blue-500">{links}</ul>
+          </DetailSection>
+        );
+      })()}
+
+      {(primaryVideo || videoUrl) && (
+        <DetailSection title="動画">
+          {primaryVideo ? (
+            <div className="relative w-full h-[480px]">
+              <iframe
+                src={primaryVideo?.previewUrl ?? primaryVideo?.webViewUrl ?? primaryVideo?.downloadUrl ?? ""}
+                title="作品動画"
+                className="w-full h-full rounded-lg shadow-md border-0"
+                allow="autoplay; encrypted-media"
+                allowFullScreen
+              />
+            </div>
+          ) : videoUrl ? (
+            <p>指定された動画ファイル ({videoUrl}) を見つけられませんでした。</p>
+          ) : null}
+        </DetailSection>
+      )}
+
+      {(primaryPdf || pdfUrl) && (
+        <DetailSection title="資料">
+          {primaryPdf ? (
+            <iframe
+              src={primaryPdf?.previewUrl ?? primaryPdf?.webViewUrl ?? primaryPdf?.downloadUrl ?? ""}
+              title="作品資料"
+              className="w-full h-[640px] border-0 rounded-lg shadow-md"
+            />
+          ) : pdfUrl ? (
+            <p>指定されたPDFファイル ({pdfUrl}) を見つけられませんでした。</p>
+          ) : null}
+        </DetailSection>
+      )}
+
+      {listedAssets.length > 0 && (
+        <DetailSection title="添付ファイル一覧">
           <ul className="space-y-2">
             {listedAssets.map((asset) => (
               <li key={asset.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
@@ -333,10 +351,8 @@ export default async function ProjectDetailPage({
               </li>
             ))}
           </ul>
-        ) : (
-          <p>追加ファイルは登録されていません。</p>
-        )}
-      </DetailSection>
+        </DetailSection>
+      )}
 
       {meta.licenseNotes?.trim() && (
         <DetailSection title="ライセンス・使用素材の注意">

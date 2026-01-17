@@ -38,30 +38,6 @@ function ProjectCard({ project }: { project: ProjectListItem }) {
     </div>
   );
 
-  const websiteLink = project.websiteUrl ? (
-    <p className="mt-3 text-sm">
-      <a
-        href={project.websiteUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="text-blue-600 dark:text-blue-400 hover:underline"
-      >
-        作品サイト
-      </a>
-    </p>
-  ) : null;
-
-  if (hasDetailPage) {
-    return (
-      <div className="h-full">
-        <Link href={href} className="block h-full">
-          {cardContent}
-        </Link>
-        {websiteLink}
-      </div>
-    );
-  }
-
   if (project.websiteUrl) {
     return (
       <a
